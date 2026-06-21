@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a3a5c">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="Bluefitness IA">
+<meta name="apple-mobile-web-app-title" content="Bluefitness">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='180'%20height='180'%3E%3Crect%20width='180'%20height='180'%20rx='38'%20fill='%231a3a5c'/%3E%3Crect%20x='38'%20y='82'%20width='104'%20height='16'%20rx='4'%20fill='%23e8a020'/%3E%3Crect%20x='28'%20y='66'%20width='20'%20height='48'%20rx='5'%20fill='%23fff'/%3E%3Crect%20x='132'%20y='66'%20width='20'%20height='48'%20rx='5'%20fill='%23fff'/%3E%3Crect%20x='16'%20y='76'%20width='14'%20height='28'%20rx='4'%20fill='%233b82c4'/%3E%3Crect%20x='150'%20y='76'%20width='14'%20height='28'%20rx='4'%20fill='%233b82c4'/%3E%3C/svg%3E">
+<title>Bluefitness — Treino & Nutrição IA</title>
+<style>
+:root{
+  --azul:#1a3a5c;--azul-m:#2563a8;--azul-c:#3b82c4;--accent:#e8a020;
+  --verde:#16a34a;--vermelho:#dc2626;--bg:#f0f4f8;--borda:#cbd5e1;
+  --texto:#1e293b;--texto-leve:#64748b;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--texto);min-height:100vh}
+.tela{display:none}
+.tela.ativa{display:block}
+
+header{background:var(--azul);color:#fff;padding:14px 18px 12px;padding-top:calc(14px + env(safe-area-inset-top,0px));position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px}
+.voltar{background:rgba(255,255,255,0.15);border:none;border-radius:8px;width:34px;height:34px;color:#fff;font-size:1.2rem;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+header .htxt h1{font-size:0.95rem;font-weight:700;line-height:1.2}
+header .htxt p{font-size:0.68rem;opacity:0.65;margin-top:2px}
+.btn-set{margin-left:auto;background:rgba(255,255,255,0.15);border:none;border-radius:8px;padding:6px 10px;color:#fff;font-size:0.85rem;cursor:pointer;flex-shrink:0}
+
+main{padding:14px 14px 100px;max-width:560px;margin:0 auto}
+
+/* ── HOME GRID ── */
+.intro{font-size:0.8rem;color:var(--texto-leve);line-height:1.5;margin-bottom:16px;text-align:center;padding:0 8px}
+.modos{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.modo-card{background:#fff;border-radius:14px;padding:16px 13px;border:1px solid rgba(0,0,0,0.06);cursor:pointer;transition:all .14s;display:flex;flex-direction:column;gap:8px;min-height:120px}
+.modo-card:active{transform:scale(.97)}
+.modo-ico{width:40px;height:40px;border-radius:11px;background:var(--azul);display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+.modo-card.full{grid-column:1/-1;flex-direction:row;align-items:center;min-height:auto;padding:15px 16px}
+.modo-card.full .modo-ico{flex-shrink:0}
+.modo-tit{font-size:0.85rem;font-weight:700;color:var(--azul);line-height:1.25}
+.modo-desc{font-size:0.7rem;color:var(--texto-leve);line-height:1.4}
+.modo-num{position:absolute}
+
+/* ── CARDS FORM ── */
+.card{background:#fff;border-radius:14px;padding:18px 16px;margin-bottom:12px;border:1px solid rgba(0,0,0,0.06)}
+.card-titulo{font-size:0.74rem;font-weight:700;color:var(--azul);text-transform:uppercase;letter-spacing:.7px;margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.campo{margin-bottom:12px}.campo:last-child{margin-bottom:0}
+label{display:block;font-size:0.7rem;font-weight:600;color:var(--texto-leve);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}
+input[type=text],input[type=number],input[type=password],select,textarea{width:100%;padding:11px 13px;border:1.5px solid var(--borda);border-radius:10px;font-size:0.9rem;color:var(--texto);background:#fff;font-family:inherit;-webkit-appearance:none;appearance:none;min-height:44px;transition:border-color .15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--azul-c);box-shadow:0 0 0 3px rgba(59,130,196,.12)}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:36px}
+textarea{resize:vertical;min-height:72px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pill-wrap{display:flex;flex-wrap:wrap;gap:7px}
+.pill{padding:7px 13px;border:1.5px solid var(--borda);border-radius:20px;font-size:0.78rem;font-weight:600;color:var(--texto-leve);cursor:pointer;user-select:none;transition:all .12s;min-height:36px;display:flex;align-items:center}
+.pill.on{border-color:var(--azul-m);background:#eff6ff;color:var(--azul-m)}
+.nivel-wrap{display:flex;flex-wrap:wrap;gap:7px}
+.nivel-btn{flex:1;min-width:78px;padding:9px 4px;border:1.5px solid var(--borda);border-radius:9px;font-size:0.75rem;font-weight:600;color:var(--texto-leve);cursor:pointer;text-align:center;background:#fff;transition:all .12s;min-height:40px}
+.nivel-btn.on{border-color:var(--azul-m);background:var(--azul);color:#fff}
+.semaforo-wrap{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.semaforo-btn{padding:10px 6px;border:1.5px solid var(--borda);border-radius:10px;font-size:0.75rem;font-weight:600;cursor:pointer;text-align:center;background:#fff;color:var(--texto-leve);line-height:1.45;min-height:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:all .12s}
+.semaforo-btn .dot{font-size:1.1rem;margin-bottom:2px}
+.s-verde.on{border-color:#16a34a;background:#f0fdf4;color:#15803d}
+.s-amarelo.on{border-color:#b45309;background:#fffbeb;color:#92400e}
+.s-laranja.on{border-color:#c2410c;background:#fff7ed;color:#9a3412}
+.s-vermelho.on{border-color:#dc2626;background:#fef2f2;color:#b91c1c}
+.check-wrap{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.check-item{display:flex;align-items:center;gap:7px;padding:8px 10px;border:1.5px solid var(--borda);border-radius:9px;cursor:pointer;font-size:0.75rem;font-weight:500;color:var(--texto-leve);user-select:none;transition:all .12s;min-height:38px}
+.check-item.on{border-color:var(--azul-m);background:#eff6ff;color:var(--azul-m)}
+.cbox{width:15px;height:15px;border-radius:4px;border:1.5px solid var(--borda);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .12s;font-size:10px;color:#fff}
+.check-item.on .cbox{background:var(--azul-m);border-color:var(--azul-m)}
+.cbox span{display:none}.check-item.on .cbox span{display:block}
+.divisor{height:1px;background:var(--borda);margin:14px 0}
+
+.fab{position:fixed;bottom:0;left:0;right:0;padding:12px 14px;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--bg) 70%,transparent);z-index:99}
+.btn-gerar{width:100%;max-width:560px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:8px;padding:15px;background:var(--azul);color:#fff;border:none;border-radius:14px;font-size:0.95rem;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(26,58,92,.3);transition:all .15s}
+.btn-gerar:active{transform:scale(.98)}
+
+/* ── SETUP ── */
+#telaSetup{background:var(--azul);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;padding-top:calc(32px + env(safe-area-inset-top,0px));text-align:center}
+.setup-logo{font-size:3rem;margin-bottom:16px}
+.setup-titulo{font-size:1.3rem;font-weight:700;color:#fff;margin-bottom:8px}
+.setup-desc{font-size:0.85rem;color:rgba(255,255,255,.7);line-height:1.6;margin-bottom:28px}
+.setup-card{background:#fff;border-radius:16px;padding:24px;width:100%;max-width:400px}
+.setup-card label{color:var(--texto);text-align:left}
+.setup-card input{margin-top:6px;font-size:0.82rem}
+.setup-hint{font-size:0.72rem;color:var(--texto-leve);margin-top:8px;text-align:left;line-height:1.5}
+.btn-setup{width:100%;padding:13px;background:var(--azul);color:#fff;border:none;border-radius:10px;font-size:0.95rem;font-weight:700;cursor:pointer;margin-top:16px}
+.link-onde{font-size:0.78rem;color:rgba(255,255,255,.6);margin-top:20px}
+.link-onde a{color:rgba(255,255,255,.85)}
+
+/* ── GERANDO ── */
+#telaGerando{min-height:100vh;display:flex;flex-direction:column}
+.gerando-header{background:var(--azul);color:#fff;padding:16px 18px;padding-top:calc(16px + env(safe-area-inset-top,0px));display:flex;align-items:center;gap:12px}
+.gerando-titulo{font-size:0.92rem;font-weight:700}
+.gerando-sub{font-size:0.7rem;opacity:0.65;margin-top:3px}
+.gerando-progress{height:3px;background:rgba(255,255,255,.2);margin:10px 18px 0;border-radius:2px;overflow:hidden}
+.gerando-barra{height:100%;background:var(--accent);border-radius:2px;animation:barra 2s ease-in-out infinite}
+@keyframes barra{0%{width:0;margin-left:0}50%{width:60%;margin-left:20%}100%{width:0;margin-left:100%}}
+.output-scroll{flex:1;padding:16px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.output-box{background:#fff;border-radius:14px;padding:18px;font-size:0.84rem;line-height:1.75;white-space:pre-wrap;color:var(--texto);border:1px solid rgba(0,0,0,.06);min-height:200px;word-wrap:break-word}
+.cursor{display:inline-block;width:2px;height:14px;background:var(--azul-m);margin-left:2px;animation:piscar .8s step-end infinite;vertical-align:middle}
+@keyframes piscar{0%,100%{opacity:1}50%{opacity:0}}
+.acoes{padding:14px;padding-bottom:calc(14px + env(safe-area-inset-bottom,0px));background:#fff;border-top:1px solid var(--borda);display:flex;gap:9px}
+.btn-acao{flex:1;padding:13px 6px;border:1.5px solid var(--borda);border-radius:12px;font-size:0.8rem;font-weight:700;cursor:pointer;text-align:center;background:#fff;color:var(--texto);display:flex;align-items:center;justify-content:center;gap:5px;min-height:46px}
+.btn-acao:active{opacity:.75}
+.btn-acao.azul{background:var(--azul-m);border-color:var(--azul-m);color:#fff}
+.btn-acao.verde{background:var(--verde);border-color:var(--verde);color:#fff}
+.erro-box{background:#fef2f2;border:1.5px solid #fca5a5;border-radius:12px;padding:16px;font-size:0.82rem;color:#b91c1c;line-height:1.55}
+.erro-box strong{display:block;margin-bottom:4px}
+.toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%) translateY(20px);background:#1e293b;color:#fff;padding:10px 20px;border-radius:20px;font-size:0.8rem;font-weight:600;opacity:0;transition:all .25s;z-index:999;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- ══ SETUP ══ -->
+<div id="telaSetup" class="tela">
+  <div class="setup-logo">🏋️</div>
+  <div class="setup-titulo">Bluefitness — Treino & Nutrição IA</div>
+  <div class="setup-desc">Para gerar planos diretamente nesta app precisas da tua chave API da Anthropic. Fica guardada só no teu dispositivo.</div>
+  <div class="setup-card">
+    <label>Chave API Anthropic</label>
+    <input type="password" id="inputApiKey" placeholder="sk-ant-api03-..." autocomplete="off" autocorrect="off" spellcheck="false">
+    <div class="setup-hint">Vai a <strong>console.anthropic.com → API Keys</strong> e cria uma chave. Pagas só pelo uso.</div>
+    <button class="btn-setup" onclick="guardarChave()">Guardar e começar</button>
+  </div>
+  <div class="link-onde"><a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></div>
+</div>
+
+<!-- ══ HOME ══ -->
+<div id="telaHome" class="tela">
+  <header>
+    <div class="htxt"><h1>🏋️ Bluefitness IA</h1><p>Escolhe o que queres gerar</p></div>
+    <button class="btn-set" onclick="mostrarSettings()">⚙️</button>
+  </header>
+  <main>
+    <p class="intro">7 ferramentas inteligentes. Escolhe uma, preenche os dados e o Claude gera tudo na hora seguindo o protocolo Bluefitness.</p>
+    <div class="modos">
+      <div class="modo-card" onclick="abrirModo('treino')">
+        <div class="modo-ico">💪</div>
+        <div class="modo-tit">Plano de Treino</div>
+        <div class="modo-desc">Plano semanal completo com séries, reps e descansos</div>
+      </div>
+      <div class="modo-card" onclick="abrirModo('dieta')">
+        <div class="modo-ico">🥗</div>
+        <div class="modo-tit">Plano de Nutrição</div>
+        <div class="modo-desc">Dieta com as calorias e proteína certas, só com comida que gostas</div>
+      </div>
+      <div class="modo-card" onclick="abrirModo('zona')">
+        <div class="modo-ico">🎯</div>
+        <div class="modo-tit">Corrigir Zona Fraca</div>
+        <div class="modo-desc">Protocolo de 30 dias para a área que precisa de mais trabalho</div>
+      </div>
+      <div class="modo-card" onclick="abrirModo('plateau')">
+        <div class="modo-ico">📈</div>
+        <div class="modo-tit">Quebrar Plateau</div>
+        <div class="modo-desc">Diagnóstico e 3 mudanças para voltar a progredir em 7 dias</div>
+      </div>
+      <div class="modo-card" onclick="abrirModo('casa')">
+        <div class="modo-ico">🏠</div>
+        <div class="modo-tit">Treino em Casa</div>
+        <div class="modo-desc">Programa sem ginásio: versão completa, 30 min e 15 min</div>
+      </div>
+      <div class="modo-card" onclick="abrirModo('recuperacao')">
+        <div class="modo-ico">😴</div>
+        <div class="modo-tit">Otimizar Recuperação</div>
+        <div class="modo-desc">Sono, stress, nutrição e recuperação ativa</div>
+      </div>
+      <div class="modo-card full" onclick="abrirModo('transformacao')">
+        <div class="modo-ico">🔥</div>
+        <div>
+          <div class="modo-tit">Transformação 90 Dias</div>
+          <div class="modo-desc">Protocolo completo em 3 fases: fundação, aceleração e transformação</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ══ FORM ══ -->
+<div id="telaForm" class="tela">
+  <header>
+    <button class="voltar" onclick="mostrarTela('telaHome')">‹</button>
+    <div class="htxt"><h1 id="formTitulo">Plano de Treino</h1><p id="formSub">Protocolo Bluefitness</p></div>
+  </header>
+  <main id="formCampos"></main>
+  <div class="fab"><button class="btn-gerar" onclick="gerar()">⚡ <span id="btnGerarTxt">Gerar Plano</span></button></div>
+</div>
+
+<!-- ══ GERANDO ══ -->
+<div id="telaGerando" class="tela">
+  <div class="gerando-header">
+    <button class="voltar" onclick="mostrarTela('telaForm')">‹</button>
+    <div><div class="gerando-titulo" id="gerandoTitulo">⚡ A gerar…</div><div class="gerando-sub" id="gerandoSub">O Claude está a trabalhar</div></div>
+  </div>
+  <div class="gerando-progress"><div class="gerando-barra" id="gerandoBarra"></div></div>
+  <div class="output-scroll"><div class="output-box" id="outputBox"></div></div>
+  <div class="acoes" id="acoes" style="display:none">
+    <button class="btn-acao" onclick="mostrarTela('telaHome')">🏠 Início</button>
+    <button class="btn-acao azul" onclick="copiar()">📋 Copiar</button>
+    <button class="btn-acao verde" onclick="partilhar()">📤 Partilhar</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ════ SYSTEM PROMPT ════ */
+const SYSTEM = `És um especialista de elite em exercício físico, biomecânica, prescrição de treino e nutrição desportiva para o Bluefitness Club Leiria e Blue ON. Já transformaste mais de 1000 corpos.
+
+Princípios fixos:
+- Cada minuto tem de valer a pena. Zero exercícios ou refeições só para "encher".
+- Adaptas SEMPRE às limitações clínicas indicadas (contra-indicações absolutas e relativas).
+- Respeitas o semáforo do dia quando indicado (verde/amarelo/laranja/vermelho) para ajustar volume e carga.
+- Linguagem técnica mas acessível ao técnico de exercício. Português de Portugal.
+- Output bem estruturado, com secções claras, pronto a usar em treino real.
+
+Protocolo de treino Bluefitness (quando aplicável):
+1. Aquecimento geral · 2. 2 exercícios de mobilidade ativa · 3. Compostos/poliarticulares primeiro · 4. Principais de força/estímulo metabólico · 5. Acessórios e core
+Para CADA exercício: séries × reps/tempo | descanso | carga estimada | tempo de execução (tempo) | foco muscular | nota técnica | regressão | progressão.
+Máximo 10–12 exercícios por sessão. Terminas com relatório biomecânico: padrões usados, grupos musculares, sobrecargas possíveis, redundâncias, progressão recomendada e alertas técnicos.`;
+
+/* ════ ESTADO ════ */
+let modoAtual='treino';
+let estado={}; // guarda seleções multi (pills, nivel, semaforo, checks)
+let resultado='';
+let memKey=''; // fallback em memória se o armazenamento estiver bloqueado
+
+/* ════ ARMAZENAMENTO ROBUSTO ════ */
+function getKey(){
+  try{const k=localStorage.getItem('bf_api_key');if(k)return k;}catch(e){}
+  return memKey||'';
+}
+function setKey(k){
+  memKey=k;
+  try{localStorage.setItem('bf_api_key',k);}catch(e){}
+}
+
+/* ════ DEFINIÇÃO DOS MODOS ════
+   Cada campo: {t:'tipo', id, label, ph, opts:[], full:bool}
+   tipos: text, num, sel, area, pills, nivel, semaforo, checks
+*/
+const LIMITS=['Lombalgia / Hérnia','Hipertensão','Dor no joelho','Ombro doloroso','Cervicalgia','Diástase','Varizes / Lipedema','Asma','Osteoporose','Diabetes','Pós-operatório','Gravidez / Pós-parto'];
+const OBJS=['💪 Hipertrofia','🔥 Emagrecimento','❤️ Saúde geral','🏃 Resistência','🧘 Mobilidade / Postura','🦵 Reabilitação','⚡ Força máxima','🎽 Definição muscular','👴 Funcional / Idoso'];
+
+const MODOS={
+  treino:{titulo:'Plano de Treino',sub:'Plano semanal completo',btn:'Gerar Plano',ico:'💪',
+    campos:[
+      {sec:'👤 Identificação',campos:[
+        {t:'text',id:'nome',label:'Nome',ph:'Ex: Maria Silva'},
+        {t:'num',id:'idade',label:'Idade',ph:'42'},
+        {t:'sel',id:'genero',label:'Género',opts:['Feminino','Masculino','Outro']},
+        {t:'text',id:'peso',label:'Peso atual',ph:'70 kg'},
+        {t:'text',id:'peso_obj',label:'Peso objetivo',ph:'64 kg'},
+        {t:'text',id:'altura',label:'Altura',ph:'165 cm'}
+      ]},
+      {sec:'🎯 Objetivo',campos:[
+        {t:'pills',id:'objetivos',label:'Objetivo principal',opts:OBJS},
+        {t:'text',id:'obj_extra',label:'Detalhe (opcional)',ph:'Ex: core pós-parto',full:true}
+      ]},
+      {sec:'📋 Parâmetros',campos:[
+        {t:'sel',id:'frequencia',label:'Dias por semana',opts:['2x/semana','3x/semana','4x/semana','5x/semana','6x/semana']},
+        {t:'sel',id:'duracao',label:'Tempo por sessão',opts:['30–40 min','45 min','60 min','75 min','90 min']},
+        {t:'sel',id:'divisao',label:'Divisão',opts:['Full Body','A/B (Upper/Lower)','A/B/C (Push/Pull/Legs)','Personalizado'],full:true},
+        {t:'nivel',id:'nivel',label:'Nível',opts:[['Iniciante','Iniciante (sem experiência)'],['Básico','Básico (3–6 meses)'],['Intermédio','Intermédio (6–18 meses)'],['Avançado','Avançado (>2 anos)'],['Retorno','Retorno após paragem']],full:true},
+        {t:'sel',id:'intensidade',label:'Intensidade alvo',opts:['4–5/10 — Iniciação / Idoso / Retorno','6/10 — Saúde / Baixa condição','7/10 — Geral / Eficaz (recomendado)','8/10 — Treinado / Bom controlo','9/10 — Avançado / Alta exigência'],full:true}
+      ]},
+      {sec:'⚠️ Limitações clínicas',campos:[
+        {t:'checks',id:'limitacoes',label:'',opts:LIMITS},
+        {t:'area',id:'outras_lim',label:'Outras observações',ph:'Ex: prótese joelho esquerdo, medicação...',full:true}
+      ]},
+      {sec:'🏗️ Ambiente e equipamento',campos:[
+        {t:'sel',id:'local',label:'Local',opts:['Bluefitness Club — sala completa','Blue ON — equipamento específico','Ambos (ginásio + casa)','Casa — equipamento básico','Exterior / Funcional'],full:true},
+        {t:'text',id:'equip',label:'Equipamento',ph:'Ex: máquinas + halteres',full:true},
+        {t:'text',id:'pref',label:'Preferências / aversões',ph:'Ex: gosta de funcionais, não gosta de corrida',full:true}
+      ]},
+      {sec:'📊 Historial e dia',campos:[
+        {t:'area',id:'historico',label:'Historial / plano anterior',ph:'Ex: fez A/B 3 meses, bom progresso...',full:true},
+        {t:'semaforo',id:'semaforo',label:'Semáforo do dia',full:true},
+        {t:'area',id:'notas',label:'Notas adicionais',ph:'Ex: competição em 4 semanas...',full:true}
+      ]}
+    ]},
+
+  dieta:{titulo:'Plano de Nutrição',sub:'Dieta que funciona mesmo',btn:'Gerar Dieta',ico:'🥗',
+    campos:[
+      {sec:'👤 Identificação',campos:[
+        {t:'text',id:'nome',label:'Nome',ph:'Ex: João'},
+        {t:'num',id:'idade',label:'Idade',ph:'35'},
+        {t:'sel',id:'genero',label:'Género',opts:['Feminino','Masculino','Outro']},
+        {t:'text',id:'peso',label:'Peso atual',ph:'82 kg'},
+        {t:'text',id:'peso_obj',label:'Peso objetivo',ph:'75 kg'},
+        {t:'text',id:'altura',label:'Altura',ph:'178 cm'}
+      ]},
+      {sec:'🎯 Objetivo',campos:[
+        {t:'pills',id:'objetivos',label:'Objetivo',opts:OBJS}
+      ]},
+      {sec:'🍽️ Alimentação atual',campos:[
+        {t:'area',id:'come_atual',label:'O que comes normalmente num dia',ph:'Ex: café e torrada, sandes ao almoço, jantar variado, snacks à noite...',full:true},
+        {t:'area',id:'gosta',label:'Comida que gostas mesmo',ph:'Ex: frango, arroz, ovos, atum, fruta, iogurte...',full:true},
+        {t:'area',id:'nunca',label:'Comida que NUNCA vais comer',ph:'Ex: brócolos, peixe, tofu...',full:true},
+        {t:'text',id:'orcamento',label:'Orçamento diário (opcional)',ph:'Ex: 8€/dia',full:true}
+      ]},
+      {sec:'⚠️ Restrições',campos:[
+        {t:'area',id:'restricoes',label:'Alergias / intolerâncias / condições',ph:'Ex: intolerância à lactose, diabético...',full:true}
+      ]}
+    ]},
+
+  zona:{titulo:'Corrigir Zona Fraca',sub:'Protocolo de 30 dias',btn:'Gerar Protocolo 30 Dias',ico:'🎯',
+    campos:[
+      {sec:'🎯 Zona a corrigir',campos:[
+        {t:'text',id:'zona',label:'Área que precisa de mais trabalho',ph:'Ex: abdómen, glúteos, ombros, braços...',full:true},
+        {t:'area',id:'detalhe_zona',label:'Descreve o problema',ph:'Ex: barriga não desaparece, glúteos sem volume...',full:true}
+      ]},
+      {sec:'👤 Contexto',campos:[
+        {t:'num',id:'idade',label:'Idade',ph:'40'},
+        {t:'text',id:'peso',label:'Peso',ph:'70 kg'},
+        {t:'nivel',id:'nivel',label:'Nível',opts:[['Iniciante','Iniciante'],['Básico','Básico'],['Intermédio','Intermédio'],['Avançado','Avançado'],['Retorno','Retorno']],full:true},
+        {t:'sel',id:'frequencia',label:'Dias disponíveis',opts:['2x/semana','3x/semana','4x/semana','5x/semana','6x/semana'],full:true},
+        {t:'text',id:'equip',label:'Equipamento disponível',ph:'Ex: ginásio completo / halteres em casa',full:true}
+      ]},
+      {sec:'⚠️ Limitações',campos:[
+        {t:'checks',id:'limitacoes',label:'',opts:LIMITS},
+        {t:'area',id:'outras_lim',label:'Outras observações',ph:'',full:true}
+      ]}
+    ]},
+
+  plateau:{titulo:'Quebrar Plateau',sub:'Voltar a progredir em 7 dias',btn:'Diagnosticar Plateau',ico:'📈',
+    campos:[
+      {sec:'📊 Situação atual',campos:[
+        {t:'area',id:'stats_atual',label:'Onde estagnaste (stats atuais)',ph:'Ex: parado nos 78 kg há 6 semanas, supino preso nos 60 kg...',full:true},
+        {t:'area',id:'rotina_atual',label:'Rotina que tens seguido',ph:'Ex: treino 4x/semana A/B, défice de 300 kcal...',full:true},
+        {t:'text',id:'tempo',label:'Há quanto tempo estás parado',ph:'Ex: 6 semanas',full:true}
+      ]},
+      {sec:'👤 Contexto',campos:[
+        {t:'num',id:'idade',label:'Idade',ph:'32'},
+        {t:'text',id:'peso',label:'Peso',ph:'78 kg'},
+        {t:'pills',id:'objetivos',label:'Objetivo',opts:OBJS,full:true},
+        {t:'area',id:'recuperacao',label:'Sono / stress / recuperação',ph:'Ex: durmo 6h, stress alto no trabalho...',full:true}
+      ]}
+    ]},
+
+  casa:{titulo:'Treino em Casa',sub:'Sem ginásio, resultados reais',btn:'Gerar Treino em Casa',ico:'🏠',
+    campos:[
+      {sec:'🏠 Em casa',campos:[
+        {t:'area',id:'equip_casa',label:'Equipamento disponível (ou nenhum)',ph:'Ex: halteres 10kg, banda elástica, barra de pull-up / ou só peso corporal',full:true},
+        {t:'sel',id:'duracao',label:'Tempo por dia',opts:['15 min','20 min','30 min','45 min','60 min']},
+        {t:'sel',id:'frequencia',label:'Dias por semana',opts:['2x/semana','3x/semana','4x/semana','5x/semana','6x/semana']}
+      ]},
+      {sec:'🎯 Objetivo e contexto',campos:[
+        {t:'pills',id:'objetivos',label:'Objetivo',opts:OBJS},
+        {t:'num',id:'idade',label:'Idade',ph:'38'},
+        {t:'nivel',id:'nivel',label:'Nível',opts:[['Iniciante','Iniciante'],['Básico','Básico'],['Intermédio','Intermédio'],['Avançado','Avançado'],['Retorno','Retorno']],full:true}
+      ]},
+      {sec:'⚠️ Limitações',campos:[
+        {t:'checks',id:'limitacoes',label:'',opts:LIMITS},
+        {t:'area',id:'outras_lim',label:'Outras observações',ph:'',full:true}
+      ]}
+    ]},
+
+  recuperacao:{titulo:'Otimizar Recuperação',sub:'O que limita os teus resultados',btn:'Gerar Protocolo de Recuperação',ico:'😴',
+    campos:[
+      {sec:'😴 Situação atual',campos:[
+        {t:'text',id:'sono',label:'Sono (horas e qualidade)',ph:'Ex: 6h, acordo cansado',full:true},
+        {t:'sel',id:'stress',label:'Nível de stress',opts:['Baixo','Moderado','Alto','Muito alto'],full:true},
+        {t:'area',id:'nutricao_timing',label:'Timing da nutrição',ph:'Ex: salto o pequeno-almoço, janto tarde...',full:true},
+        {t:'sel',id:'soreness',label:'Dores musculares',opts:['Quase nenhumas','Ligeiras','Moderadas','Fortes / persistentes'],full:true}
+      ]},
+      {sec:'🎯 Contexto de treino',campos:[
+        {t:'num',id:'idade',label:'Idade',ph:'36'},
+        {t:'sel',id:'frequencia',label:'Treinos / semana',opts:['2x/semana','3x/semana','4x/semana','5x/semana','6x/semana']},
+        {t:'pills',id:'objetivos',label:'Objetivo',opts:OBJS,full:true}
+      ]}
+    ]},
+
+  transformacao:{titulo:'Transformação 90 Dias',sub:'3 fases · fundação, aceleração, transformação',btn:'Gerar Plano 90 Dias',ico:'🔥',
+    campos:[
+      {sec:'👤 Ponto de partida',campos:[
+        {t:'text',id:'nome',label:'Nome',ph:'Ex: Pedro'},
+        {t:'num',id:'idade',label:'Idade',ph:'34'},
+        {t:'sel',id:'genero',label:'Género',opts:['Feminino','Masculino','Outro']},
+        {t:'text',id:'peso',label:'Peso atual',ph:'88 kg'},
+        {t:'text',id:'altura',label:'Altura',ph:'180 cm'},
+        {t:'text',id:'gordura',label:'% gordura (se sabe)',ph:'Ex: 24%'}
+      ]},
+      {sec:'🎯 Objetivo 90 dias',campos:[
+        {t:'text',id:'stats_obj',label:'Onde queres chegar',ph:'Ex: 78 kg, visível definição abdominal',full:true},
+        {t:'pills',id:'objetivos',label:'Foco principal',opts:OBJS,full:true}
+      ]},
+      {sec:'📋 Parâmetros',campos:[
+        {t:'sel',id:'frequencia',label:'Dias por semana',opts:['3x/semana','4x/semana','5x/semana','6x/semana']},
+        {t:'sel',id:'duracao',label:'Tempo por sessão',opts:['30–40 min','45 min','60 min','75 min','90 min']},
+        {t:'nivel',id:'nivel',label:'Nível',opts:[['Iniciante','Iniciante'],['Básico','Básico'],['Intermédio','Intermédio'],['Avançado','Avançado'],['Retorno','Retorno']],full:true},
+        {t:'text',id:'local',label:'Local / equipamento',ph:'Ex: ginásio completo',full:true}
+      ]},
+      {sec:'⚠️ Limitações e contexto',campos:[
+        {t:'checks',id:'limitacoes',label:'',opts:LIMITS},
+        {t:'area',id:'outras_lim',label:'Limitações / estilo de vida',ph:'Ex: trabalho por turnos, sono irregular...',full:true}
+      ]}
+    ]}
+};
+
+/* ════ RENDER FORM ════ */
+function abrirModo(m){
+  modoAtual=m; estado={};
+  const def=MODOS[m];
+  document.getElementById('formTitulo').textContent=def.ico+' '+def.titulo;
+  document.getElementById('formSub').textContent=def.sub;
+  document.getElementById('btnGerarTxt').textContent=def.btn;
+  const main=document.getElementById('formCampos');
+  main.innerHTML='';
+  def.campos.forEach(grupo=>{
+    const card=document.createElement('div');card.className='card';
+    card.innerHTML='<div class="card-titulo">'+grupo.sec+'</div>';
+    const wrapGrid=document.createElement('div');wrapGrid.className='grid2';
+    let usaGrid=grupo.campos.some(c=>['text','num','sel'].includes(c.t)&&!c.full);
+    grupo.campos.forEach(c=>{
+      const el=renderCampo(c);
+      if(usaGrid && ['text','num','sel'].includes(c.t) && !c.full){ wrapGrid.appendChild(el); }
+      else{
+        if(wrapGrid.children.length){card.appendChild(wrapGrid.cloneNode(true));wrapGrid.innerHTML='';}
+        card.appendChild(el);
+      }
+    });
+    if(wrapGrid.children.length)card.appendChild(wrapGrid);
+    main.appendChild(card);
+  });
+  // reattach listeners for cloned grids: simpler — rebuild without clone
+  mostrarTela('telaForm');
+  document.querySelector('#telaForm main').scrollTop=0;
+  window.scrollTo(0,0);
+}
+
+function renderCampo(c){
+  const wrap=document.createElement('div');
+  if(['text','num','sel','area'].includes(c.t)){
+    wrap.className='campo';
+    let inner='<label>'+c.label+'</label>';
+    if(c.t==='text')inner+='<input type="text" data-id="'+c.id+'" placeholder="'+(c.ph||'')+'">';
+    if(c.t==='num')inner+='<input type="number" data-id="'+c.id+'" inputmode="numeric" placeholder="'+(c.ph||'')+'">';
+    if(c.t==='area')inner+='<textarea data-id="'+c.id+'" placeholder="'+(c.ph||'')+'"></textarea>';
+    if(c.t==='sel'){
+      inner+='<select data-id="'+c.id+'"><option value="">—</option>';
+      c.opts.forEach(o=>inner+='<option>'+o+'</option>');
+      inner+='</select>';
+    }
+    wrap.innerHTML=inner;
+  }
+  else if(c.t==='pills'){
+    wrap.className='campo';estado[c.id]=[];
+    let inner=(c.label?'<label>'+c.label+'</label>':'')+'<div class="pill-wrap" data-pills="'+c.id+'">';
+    c.opts.forEach(o=>inner+='<span class="pill" onclick="tglPill(this,\''+c.id+'\')">'+o+'</span>');
+    inner+='</div>';wrap.innerHTML=inner;
+  }
+  else if(c.t==='nivel'){
+    wrap.className='campo';estado[c.id]='';
+    let inner='<label>'+c.label+'</label><div class="nivel-wrap">';
+    c.opts.forEach(o=>inner+='<button class="nivel-btn" onclick="setNivel(this,\''+c.id+'\',\''+o[1]+'\')">'+o[0]+'</button>');
+    inner+='</div>';wrap.innerHTML=inner;
+  }
+  else if(c.t==='semaforo'){
+    wrap.className='campo';estado[c.id]='';
+    wrap.innerHTML='<label>'+c.label+'</label><div class="semaforo-wrap">'+
+      '<button class="semaforo-btn s-verde" onclick="setSem(this,\''+c.id+'\',\'🟢 Verde — treino normal\')"><span class="dot">🟢</span>Verde<br><small>Normal</small></button>'+
+      '<button class="semaforo-btn s-amarelo" onclick="setSem(this,\''+c.id+'\',\'🟡 Amarelo — reduzir 20–30%\')"><span class="dot">🟡</span>Amarelo<br><small>–20–30%</small></button>'+
+      '<button class="semaforo-btn s-laranja" onclick="setSem(this,\''+c.id+'\',\'🟠 Laranja — reduzir bastante\')"><span class="dot">🟠</span>Laranja<br><small>Reduzir +</small></button>'+
+      '<button class="semaforo-btn s-vermelho" onclick="setSem(this,\''+c.id+'\',\'🔴 Vermelho — mobilidade/cardio leve\')"><span class="dot">🔴</span>Vermelho<br><small>Recup. ativa</small></button>'+
+      '</div>';
+  }
+  else if(c.t==='checks'){
+    wrap.className='campo';estado[c.id]=[];
+    let inner=(c.label?'<label>'+c.label+'</label>':'')+'<div class="check-wrap">';
+    c.opts.forEach(o=>inner+='<span class="check-item" onclick="tglCheck(this,\''+c.id+'\',\''+o+'\')"><span class="cbox"><span>✓</span></span>'+o+'</span>');
+    inner+='</div>';wrap.innerHTML=inner;
+  }
+  return wrap;
+}
+
+/* ════ HANDLERS ════ */
+function tglPill(el,id){el.classList.toggle('on');const t=el.textContent.trim();if(el.classList.contains('on'))estado[id].push(t);else estado[id]=estado[id].filter(x=>x!==t);}
+function setNivel(btn,id,val){btn.parentElement.querySelectorAll('.nivel-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');estado[id]=val;}
+function setSem(btn,id,val){btn.parentElement.querySelectorAll('.semaforo-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');estado[id]=val;}
+function tglCheck(el,id,val){el.classList.toggle('on');if(el.classList.contains('on'))estado[id].push(val);else estado[id]=estado[id].filter(x=>x!==val);}
+
+function val(id){const el=document.querySelector('[data-id="'+id+'"]');return el?el.value.trim():'';}
+function arr(id){return (estado[id]&&estado[id].length)?estado[id].join(', '):'';}
+function sel(id){return estado[id]||'';}
+
+/* ════ CONSTRUIR PROMPT POR MODO ════ */
+function construirPrompt(){
+  const m=modoAtual;
+  function bloco(titulo,linhas){const l=linhas.filter(x=>x);return l.length?'\n\n'+titulo+'\n'+l.join('\n'):'';}
+  let p='';
+
+  if(m==='treino'){
+    p='Cria um plano de treino semanal completo seguindo o protocolo Bluefitness.';
+    p+=bloco('IDENTIFICAÇÃO',[
+      val('nome')&&'• Nome: '+val('nome'),
+      val('idade')&&'• Idade: '+val('idade')+' anos',
+      sel('genero')||val('genero')?('• Género: '+(val('genero'))):'',
+      val('peso')&&'• Peso atual: '+val('peso'),
+      val('peso_obj')&&'• Peso objetivo: '+val('peso_obj'),
+      val('altura')&&'• Altura: '+val('altura')]);
+    p+=bloco('OBJETIVO',[arr('objetivos')&&'• Objetivo: '+arr('objetivos'),val('obj_extra')&&'• Detalhe: '+val('obj_extra')]);
+    p+=bloco('PARÂMETROS',[val('frequencia')&&'• Frequência: '+val('frequencia'),val('duracao')&&'• Duração: '+val('duracao'),val('divisao')&&'• Divisão: '+val('divisao'),sel('nivel')&&'• Nível: '+sel('nivel'),val('intensidade')&&'• Intensidade: '+val('intensidade')]);
+    p+=bloco('LIMITAÇÕES CLÍNICAS',[arr('limitacoes')&&'• Condições: '+arr('limitacoes'),val('outras_lim')&&'• Outras: '+val('outras_lim')]);
+    p+=bloco('AMBIENTE',[val('local')&&'• Local: '+val('local'),val('equip')&&'• Equipamento: '+val('equip'),val('pref')&&'• Preferências: '+val('pref')]);
+    p+=bloco('HISTORIAL',[val('historico')]);
+    p+=bloco('SEMÁFORO DO DIA',[sel('semaforo')]);
+    p+=bloco('NOTAS',[val('notas')]);
+    p+='\n\nGera o plano completo com todos os detalhes técnicos por exercício e relatório biomecânico final. Faz cada minuto valer a pena, zero exercícios de enchimento.';
+  }
+  else if(m==='dieta'){
+    p='Esquece todos os planos alimentares genéricos. Desenha um plano de nutrição completo e personalizado que o aluno vá ANSIAR comer, não apenas tolerar, usando só comida da lista de que ele gosta.';
+    p+=bloco('IDENTIFICAÇÃO',[val('nome')&&'• Nome: '+val('nome'),val('idade')&&'• Idade: '+val('idade'),val('genero')&&'• Género: '+val('genero'),val('peso')&&'• Peso atual: '+val('peso'),val('peso_obj')&&'• Peso objetivo: '+val('peso_obj'),val('altura')&&'• Altura: '+val('altura')]);
+    p+=bloco('OBJETIVO',[arr('objetivos')&&'• Objetivo: '+arr('objetivos')]);
+    p+=bloco('ALIMENTAÇÃO ATUAL',[val('come_atual')&&'• Come atualmente: '+val('come_atual'),val('gosta')&&'• Gosta mesmo: '+val('gosta'),val('nunca')&&'• Nunca vai comer: '+val('nunca'),val('orcamento')&&'• Orçamento diário: '+val('orcamento')]);
+    p+=bloco('RESTRIÇÕES',[val('restricoes')]);
+    p+='\n\nCalcula os alvos exatos de calorias e proteína para o objetivo. Apresenta refeições concretas (pequeno-almoço, almoço, jantar, snacks) com quantidades, macros por refeição e totais diários. Usa SÓ comida da lista que ele gosta. Inclui alternativas e lista de compras.';
+  }
+  else if(m==='zona'){
+    p='Desenha um protocolo focado de 30 dias para a zona do corpo que precisa de mais trabalho, com a abordagem de treino e nutrição que produz a melhoria visível mais rápida nessa área.';
+    p+=bloco('ZONA A CORRIGIR',[val('zona')&&'• Área: '+val('zona'),val('detalhe_zona')&&'• Problema: '+val('detalhe_zona')]);
+    p+=bloco('CONTEXTO',[val('idade')&&'• Idade: '+val('idade'),val('peso')&&'• Peso: '+val('peso'),sel('nivel')&&'• Nível: '+sel('nivel'),val('frequencia')&&'• Dias disponíveis: '+val('frequencia'),val('equip')&&'• Equipamento: '+val('equip')]);
+    p+=bloco('LIMITAÇÕES',[arr('limitacoes')&&'• Condições: '+arr('limitacoes'),val('outras_lim')&&'• Outras: '+val('outras_lim')]);
+    p+='\n\nO protocolo de 30 dias deve cobrir: frequência de treino, seleção exata de exercícios, ajustes de nutrição, e O ERRO que a maioria comete ao tentar melhorar esta zona que faz tudo demorar o dobro. Estrutura por semanas.';
+  }
+  else if(m==='plateau'){
+    p='Diagnostica este plateau como um cientista do desporto. Encontra todas as razões fisiológicas e comportamentais possíveis para o progresso ter parado completamente.';
+    p+=bloco('SITUAÇÃO',[val('stats_atual')&&'• Estagnação: '+val('stats_atual'),val('rotina_atual')&&'• Rotina seguida: '+val('rotina_atual'),val('tempo')&&'• Há quanto tempo: '+val('tempo')]);
+    p+=bloco('CONTEXTO',[val('idade')&&'• Idade: '+val('idade'),val('peso')&&'• Peso: '+val('peso'),arr('objetivos')&&'• Objetivo: '+arr('objetivos'),val('recuperacao')&&'• Recuperação: '+val('recuperacao')]);
+    p+='\n\nDá 3 mudanças específicas para fazer esta semana, diferentes o suficiente para reiniciar o progresso visível, sem abandonar tudo o que já estava a funcionar antes do plateau. Explica o porquê fisiológico de cada uma.';
+  }
+  else if(m==='casa'){
+    p='O ginásio não é opção. Desenha um programa de treino em casa completo que entregue resultados visíveis reais dentro das restrições indicadas.';
+    p+=bloco('EM CASA',[val('equip_casa')&&'• Equipamento: '+val('equip_casa'),val('duracao')&&'• Tempo por dia: '+val('duracao'),val('frequencia')&&'• Dias por semana: '+val('frequencia')]);
+    p+=bloco('OBJETIVO E CONTEXTO',[arr('objetivos')&&'• Objetivo: '+arr('objetivos'),val('idade')&&'• Idade: '+val('idade'),sel('nivel')&&'• Nível: '+sel('nivel')]);
+    p+=bloco('LIMITAÇÕES',[arr('limitacoes')&&'• Condições: '+arr('limitacoes'),val('outras_lim')&&'• Outras: '+val('outras_lim')]);
+    p+='\n\nInclui 3 versões: uma versão completa, uma versão de 30 minutos, e uma versão de emergência de 15 minutos para os dias em que tudo corre mal. Cada minuto tem de contar, zero minutos desperdiçados.';
+  }
+  else if(m==='recuperacao'){
+    p='Estuda como o quadro de recuperação atual está a limitar os resultados e desenha um protocolo completo de otimização de recuperação.';
+    p+=bloco('SITUAÇÃO ATUAL',[val('sono')&&'• Sono: '+val('sono'),sel('stress')&&'• Stress: '+sel('stress'),val('nutricao_timing')&&'• Timing nutrição: '+val('nutricao_timing'),sel('soreness')&&'• Dores musculares: '+sel('soreness')]);
+    p+=bloco('CONTEXTO DE TREINO',[val('idade')&&'• Idade: '+val('idade'),val('frequencia')&&'• Treinos/semana: '+val('frequencia'),arr('objetivos')&&'• Objetivo: '+arr('objetivos')]);
+    p+='\n\nO protocolo deve cobrir sono, nutrição, recuperação ativa e gestão de stress. Inclui A intervenção de recuperação que dá a maior melhoria nos resultados de treino mais rapidamente e que a maioria nunca prioriza, apesar de ser mais importante que o próprio treino.';
+  }
+  else if(m==='transformacao'){
+    p='Desenha um protocolo completo de transformação corporal de 90 dias, dividido em 3 fases mensais: Fase 1 Fundação, Fase 2 Aceleração, Fase 3 Transformação.';
+    p+=bloco('PONTO DE PARTIDA',[val('nome')&&'• Nome: '+val('nome'),val('idade')&&'• Idade: '+val('idade'),val('genero')&&'• Género: '+val('genero'),val('peso')&&'• Peso atual: '+val('peso'),val('altura')&&'• Altura: '+val('altura'),val('gordura')&&'• % gordura: '+val('gordura')]);
+    p+=bloco('OBJETIVO 90 DIAS',[val('stats_obj')&&'• Meta: '+val('stats_obj'),arr('objetivos')&&'• Foco: '+arr('objetivos')]);
+    p+=bloco('PARÂMETROS',[val('frequencia')&&'• Dias/semana: '+val('frequencia'),val('duracao')&&'• Tempo/sessão: '+val('duracao'),sel('nivel')&&'• Nível: '+sel('nivel'),val('local')&&'• Local/equipamento: '+val('local')]);
+    p+=bloco('LIMITAÇÕES E CONTEXTO',[arr('limitacoes')&&'• Condições: '+arr('limitacoes'),val('outras_lim')&&'• Outras: '+val('outras_lim')]);
+    p+='\n\nPara cada fase dá: abordagem exata de treino, alvos de nutrição, e O hábito diário não-negociável que faz todas as outras partes da fase funcionarem como planeado. Plano agressivo o suficiente para resultados visíveis e realista o suficiente para realmente terminar.';
+  }
+  return p;
+}
+
+/* ════ CHAMADA API (streaming) ════ */
+async function gerar(){
+  const key=getKey();
+  if(!key){mostrarTela('telaSetup');return;}
+  const prompt=construirPrompt();
+  resultado='';
+  mostrarTela('telaGerando');
+  document.getElementById('outputBox').innerHTML='<span class="cursor"></span>';
+  document.getElementById('acoes').style.display='none';
+  document.getElementById('gerandoTitulo').textContent='⚡ A gerar…';
+  document.getElementById('gerandoSub').textContent='O Claude está a trabalhar';
+  const barra=document.getElementById('gerandoBarra');
+  barra.style.animation='barra 2s ease-in-out infinite';barra.style.width='';barra.style.background='var(--accent)';
+
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'x-api-key':key,'anthropic-version':'2023-06-01','content-type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:8000,stream:true,system:SYSTEM,messages:[{role:'user',content:prompt}]})
+    });
+    if(!resp.ok){const e=await resp.json().catch(()=>({error:{message:'Erro '+resp.status}}));throw new Error(e.error?.message||('HTTP '+resp.status));}
+    const reader=resp.body.getReader();const dec=new TextDecoder();let buf='';
+    while(true){
+      const{done,value}=await reader.read();if(done)break;
+      buf+=dec.decode(value,{stream:true});
+      const lines=buf.split('\n');buf=lines.pop();
+      for(const line of lines){
+        if(!line.startsWith('data: '))continue;
+        const d=line.slice(6).trim();if(d==='[DONE]')continue;
+        try{const j=JSON.parse(d);if(j.type==='content_block_delta'&&j.delta?.text){resultado+=j.delta.text;document.getElementById('outputBox').innerHTML=esc(resultado)+'<span class="cursor"></span>';const s=document.querySelector('.output-scroll');s.scrollTop=s.scrollHeight;}}catch(e){}
+      }
+    }
+    document.getElementById('outputBox').innerHTML=esc(resultado);
+    document.getElementById('gerandoTitulo').textContent='✅ Pronto!';
+    document.getElementById('gerandoSub').textContent='Copia, partilha ou volta ao início';
+    barra.style.animation='none';barra.style.width='100%';barra.style.background='#16a34a';
+    document.getElementById('acoes').style.display='flex';
+  }catch(err){
+    document.getElementById('outputBox').innerHTML='<div class="erro-box"><strong>❌ Erro ao gerar</strong>'+esc(err.message)+'<br><br>Verifica a chave API em ⚙️.</div>';
+    document.getElementById('gerandoTitulo').textContent='❌ Erro';
+    barra.style.animation='none';barra.style.width='100%';barra.style.background='#dc2626';
+    document.getElementById('acoes').style.display='flex';
+  }
+}
+
+function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function copiar(){if(navigator.clipboard&&resultado)navigator.clipboard.writeText(resultado).then(()=>toast('Copiado!'));}
+function partilhar(){if(navigator.share&&resultado)navigator.share({title:MODOS[modoAtual].titulo+' — Bluefitness',text:resultado}).catch(()=>{});else copiar();}
+
+function mostrarSettings(){const k=getKey();const n=prompt('Chave API Anthropic:',k);if(n!==null){setKey(n.trim());toast('Chave guardada!');}}
+function guardarChave(){
+  const k=document.getElementById('inputApiKey').value.trim();
+  if(!k){alert('Cola a tua chave API primeiro.');return;}
+  if(!k.startsWith('sk-ant')){
+    if(!confirm('Esta chave não parece ter o formato habitual (sk-ant-...). Queres guardar mesmo assim?'))return;
+  }
+  setKey(k);
+  toast('Chave guardada!');
+  mostrarTela('telaHome');
+}
+function mostrarTela(id){['telaSetup','telaHome','telaForm','telaGerando'].forEach(t=>{const el=document.getElementById(t);if(t===id){el.style.display=t==='telaGerando'?'flex':'block';el.classList.add('ativa');if(t==='telaGerando')el.style.flexDirection='column';}else{el.style.display='none';el.classList.remove('ativa');}});window.scrollTo(0,0);}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+
+
+window.addEventListener('DOMContentLoaded',()=>{mostrarTela(getKey()?'telaHome':'telaSetup');});
+</script>
+</body>
+</html>
