@@ -1,0 +1,98 @@
+<header>
+ <div class="top"><div><h1>BLUE SYMBIOTE v10</h1><div class="sub">instalável · offline · portátil · aulas + imagens + BLUE EDU + aprendizagem</div></div><div class="topActions"><span class="devicePill" id="networkBadge">ONLINE</span><button class="btn primary installTop" id="installTopBtn">INSTALAR</button><div class="badge" id="learnBadge">Perfil 0%</div></div></div>
+ <div class="tabs">
+  <button class="active" data-view="config">CONFIGURAR</button>
+  <button data-view="suggest">SUGESTÕES</button>
+  <button data-view="build">AULA</button>
+  <button data-view="follow">SEGUIR</button>
+  <button data-view="edu">BLUE EDU</button>
+  <button data-view="visual">IMAGENS</button>
+  <button data-view="history">HISTÓRICO</button>
+ </div>
+</header>
+
+<main>
+<section id="config" class="view active">
+ <div class="goodbox"><b>Fluxo correto:</b> não escolhes criador. Dizes-me <b>que aula precisas</b>. A app cruza duração, modalidade, dificuldade, grupo, material e restrições e mostra as melhores opções — vídeos reais compatíveis + opção totalmente nova.</div>
+ <div class="card">
+  <h2>1) Que aula vais dar?</h2>
+  <div class="grid">
+   <div class="field"><label>Modalidade</label><select id="classType"><option>Mobilidade</option><option selected>Mobilidade + Core</option><option>Body & Mind</option><option>Core</option><option>Mix Training</option><option>Functional Training</option><option>Primal-inspired</option></select></div>
+   <div class="field"><label>Duração total</label><select id="duration"><option>40</option><option selected>50</option><option>60</option></select></div>
+   <div class="field"><label>Grupo</label><select id="specialGroup"><option selected>Geral</option><option>Sénior / 60+</option><option>Iniciantes</option><option>Low Impact</option><option>Punhos sensíveis</option><option>Joelho sensível</option><option>Recuperação / descarga</option></select></div>
+   <div class="field"><label>Pessoas</label><input id="groupSize" type="number" min="1" max="40" value="12"></div>
+   <div class="field"><label>Dificuldade 0–10</label><div class="rangeRow"><input id="difficulty" type="range" min="0" max="10" value="6" step="1"><div id="difficultyValue" class="rangeValue">6</div></div></div>
+   <div class="field"><label>Material</label><select id="equipment"><option selected>Sem equipamento</option><option>Colchonetes</option><option>Kettlebell</option><option>Kettlebell + peso corporal</option><option>1 haltere / peso</option><option>Leve variado</option></select></div>
+   <div class="field"><label>Impacto</label><select id="impact"><option selected>Baixo</option><option>Médio</option><option>Alto</option></select></div>
+   <div class="field"><label>Foco</label><select id="focus"><option selected>Full body</option><option>Core</option><option>Anca / membros inferiores</option><option>Ombro / torácica</option><option>Cadeia posterior</option><option>Coordenação / controlo</option></select></div>
+   <div class="field"><label>Apoios externos</label><select id="supports"><option selected>Não</option><option>Sim</option></select></div>
+   <div class="field"><label>Fluidez posicional</label><select id="flowRule"><option selected>Prioritária</option><option>Flexível</option><option>Livre</option></select></div>
+   <div class="field"><label>Aquecimento se criar de raiz</label><select id="warmup"></select></div>
+   <div class="field"><label>Ao importar vídeo extraído</label><select id="importMode"><option>Manter ordem original</option><option selected>Adaptar à fluidez BLUE</option></select></div>
+  </div>
+  <div style="margin-top:8px"><label>Restrições / contexto</label><input id="restrictions" type="text" placeholder="Ex.: sem saltos, pouco espaço, punhos sensíveis, turma cansada..."></div>
+  <div class="row" style="margin-top:9px">
+    <button class="btn primary" id="findBtn">VER MELHORES SUGESTÕES</button>
+    <button class="btn" id="scratchBtn">CRIAR TOTALMENTE NOVA</button>
+  </div>
+ </div>
+</section>
+
+<section id="suggest" class="view">
+ <div class="card">
+  <h2>Melhores sugestões para os teus filtros</h2>
+  <div id="filterSummary" class="note"></div>
+ </div>
+ <div id="suggestions"></div>
+ <div class="card">
+  <h2>Ou criar de raiz</h2>
+  <div class="note">Se nenhuma referência te convencer, a app usa a biblioteca BLUE e cria uma aula completamente nova com os mesmos filtros.</div>
+  <button class="btn primary" id="scratchFromSuggest">CRIAR AULA NOVA</button>
+ </div>
+</section>
+
+<section id="build" class="view">
+ <div class="kpis">
+  <div class="kpi"><b id="bType">—</b><span>MODALIDADE</span></div>
+  <div class="kpi"><b id="bMin">—</b><span>ALVO</span></div>
+  <div class="kpi"><b id="bBlocks">—</b><span>BLOCOS</span></div>
+  <div class="kpi"><b id="bEx">—</b><span>EXERCÍCIOS</span></div>
+  <div class="kpi"><b id="bScore">—</b><span>FIT SCORE</span></div>
+ </div>
+ <div id="sourceBox"></div>
+ <div id="diagnostic"></div>
+ <div id="blocks"></div>
+ <div class="footerbar row">
+  <button class="btn primary" id="saveBtn">GUARDAR AULA</button>
+  <button class="btn" id="followBtn">SEGUIR NO TELEMÓVEL</button>
+  <button class="btn" id="printBtn">PDF / IMPRIMIR</button>
+  <button class="btn" id="feedbackBtn">FEEDBACK</button>
+ </div>
+</section>
+
+<section id="follow" class="view">
+ <div class="card noprint">
+  <h2>Modo aula</h2>
+  <div class="row"><button class="btn primary" id="scrollModeBtn">SCROLL</button><button class="btn" id="stepModeBtn">SEGUINTE / ANTERIOR</button></div>
+ </div>
+ <div id="scrollMode"></div>
+ <div id="stepMode" style="display:none">
+  <div class="followCard">
+   <div id="stepCounter" class="counter">0 / 0</div>
+   <div id="stepTitle" class="bigtitle">—</div>
+   <div id="stepSub" class="note" style="margin-top:5px"></div>
+   <div id="stepImg" class="bigimg"></div>
+   <div id="stepMeta" class="chips"></div>
+   <div id="stepNotes" class="note" style="margin-top:9px"></div>
+   <div class="row" style="margin-top:12px"><button class="btn" id="prevBtn">ANTERIOR</button><button class="btn primary" id="nextBtn">SEGUINTE</button><button class="btn" id="stepEduBtn">BLUE EDU</button></div>
+  </div>
+ </div>
+</section>
+
+<section id="edu" class="view">
+ <div class="card">
+  <h2>BLUE EDU — Educação do Movimento</h2>
+  <div class="note">Camada técnica para <b>pensar, ensinar e decidir melhor</b>. Não é um manual para decorar: cada exercício mostra o essencial para a aula e permite abrir a ficha completa de treinador. As tuas correções ficam guardadas e substituem a versão automática desse exercício.</div>
+  <div class="storageNote" style="margin-top:8px"><b>Princípio:</b> execução antes de intensidade; compreender objetivo, posição e exigência antes de progredir. A ficha distingue <b>identificação da fonte</b> de <b>validação técnica</b> para não criar falsa certeza.</div>
+  <div class="eduToolbar" style="margin-top:9px">
+   <input id="eduSearch" type="text" placeholder="Pesquisar: squat, hinge, 90/90, dead bug, rotação...">
