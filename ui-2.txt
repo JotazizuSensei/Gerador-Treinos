@@ -1,0 +1,94 @@
+
+   <select id="eduFamily"><option value="">Todas as modalidades</option></select>
+   <select id="eduCustom"><option value="">Todas as fichas</option><option value="custom">Só personalizadas</option><option value="auto">Só automáticas</option></select>
+  </div>
+  <div class="row"><span class="chip" id="eduStats">0 exercícios</span><span class="chip">Abrir ficha → editar → guardar → reutilizar</span></div>
+ </div>
+ <div id="eduList"></div>
+</section>
+
+<section id="visual" class="view">
+ <div class="card">
+  <h2>Biblioteca Visual BLUE</h2>
+  <div class="note">Cria as imagens à parte e coloca-as aqui. Cada exercício pode guardar <b>até 2 imagens</b>. Depois ficam associadas ao exercício e aparecem automaticamente em todas as aulas futuras e no modo SEGUIR.</div>
+  <div class="storageNote" style="margin-top:8px"><b>Importante:</b> as imagens são reduzidas automaticamente para um tamanho adequado e guardadas no navegador em IndexedDB, para não rebentar o limite do localStorage. Usa o <b>BACKUP COMPLETO</b> para levares imagens + histórico + aprendizagem para outro dispositivo.</div>
+  <div class="visualToolbar" style="margin-top:9px">
+   <input id="visualSearch" type="text" placeholder="Pesquisar exercício: 90/90, dead bug, squat, thread the needle...">
+   <select id="visualFamily"><option value="">Todas as modalidades</option></select>
+  </div>
+  <div class="row">
+   <button class="btn primary" id="exportVisualBtn">EXPORTAR BACKUP COMPLETO</button>
+   <button class="btn good" id="exportHtmlVisualBtn">GUARDAR APP COM IMAGENS</button>
+   <button class="btn" id="importVisualBtn">IMPORTAR BACKUP</button>
+   <input id="importVisualFile" type="file" accept=".json" style="display:none">
+   <button class="btn bad" id="clearVisualBtn">LIMPAR SÓ IMAGENS</button>
+  </div>
+ </div>
+ <div id="visualList"></div>
+</section>
+
+<section id="history" class="view">
+ <div id="updateBox" class="updateBox"><b>Nova versão disponível.</b> Podes atualizar sem apagar os dados locais.<div class="row" style="margin-top:7px"><button class="btn primary" id="applyUpdateBtn">ATUALIZAR AGORA</button></div></div>
+ <div class="card">
+  <h2>Este dispositivo</h2>
+  <div class="note">A PWA instalada usa a mesma app no PC, portátil e telemóvel. Depois da primeira abertura online, fica disponível offline. Os teus dados permanecem neste dispositivo; usa o backup completo para mover tudo enquanto a sincronização cloud não estiver ativa.</div>
+  <div class="deviceGrid">
+   <div class="deviceStat"><b id="installStatus">Browser</b><span>modo de execução</span></div>
+   <div class="deviceStat"><b id="storageStatus">A verificar…</b><span>armazenamento</span></div>
+   <div class="deviceStat"><b id="offlineStatus">A verificar…</b><span>offline</span></div>
+  </div>
+  <div class="row" style="margin-top:8px"><button class="btn primary" id="installBtn">INSTALAR APP</button><button class="btn" id="persistBtn">PROTEGER DADOS OFFLINE</button><button class="btn" id="updateBtn">PROCURAR ATUALIZAÇÃO</button></div>
+  <div id="installHint" class="pwaHint"></div>
+ </div>
+ <div class="card">
+  <h2>Histórico + aprendizagem</h2>
+  <div id="profileInfo" class="note"></div>
+  <div class="row" style="margin-top:8px"><button class="btn primary" id="exportBtn">EXPORTAR PERFIL + HISTÓRICO</button><button class="btn" id="importBtn">IMPORTAR</button><input id="importFile" type="file" accept=".json" style="display:none"></div>
+ </div>
+ <div id="historyList"></div>
+</section>
+
+<div id="eduModal" class="eduModal" role="dialog" aria-modal="true" aria-labelledby="eduModalTitle">
+ <div class="eduPanel">
+  <div class="eduPanelHead">
+   <div><div id="eduModalTitle" class="eduTitle">BLUE EDU</div><div id="eduModalSub" class="small"></div></div>
+   <button class="btn" id="closeEduBtn">FECHAR</button>
+  </div>
+  <div class="eduPanelBody">
+   <div id="eduContextBox"></div>
+   <div id="eduGeneratedView"></div>
+   <details style="margin-top:10px" open>
+    <summary style="font-size:11px;font-weight:900;color:var(--blue);cursor:pointer">PERSONALIZAR ESTA FICHA</summary>
+    <div class="note" style="margin:7px 0">Altera apenas o que queres ensinar à tua maneira. Campos vazios continuam a usar a versão automática.</div>
+    <div class="eduEditGrid">
+     <div class="field"><label>Objetivo / o que treina</label><textarea id="eduEditPurpose"></textarea></div>
+     <div class="field"><label>Cue prioritário</label><textarea id="eduEditCue"></textarea></div>
+     <div class="field"><label>Execução / setup</label><textarea id="eduEditSetup"></textarea></div>
+     <div class="field"><label>O que observar</label><textarea id="eduEditObserve"></textarea></div>
+     <div class="field"><label>Erros frequentes</label><textarea id="eduEditErrors"></textarea></div>
+     <div class="field"><label>Regressão</label><textarea id="eduEditRegression"></textarea></div>
+     <div class="field"><label>Progressão</label><textarea id="eduEditProgression"></textarea></div>
+     <div class="field"><label>Biomecânica</label><textarea id="eduEditBiomech"></textarea></div>
+     <div class="field"><label>Cuidados / limites</label><textarea id="eduEditCare"></textarea></div>
+     <div class="field"><label>Alternativas</label><textarea id="eduEditAlternatives"></textarea></div>
+    </div>
+    <div class="row" style="margin-top:9px"><button class="btn primary" id="saveEduBtn">GUARDAR PERSONALIZAÇÃO</button><button class="btn bad" id="resetEduBtn">REPOR AUTOMÁTICO</button></div>
+   </details>
+  </div>
+ </div>
+</div>
+
+<div id="feedbackModal" style="display:none;position:fixed;inset:0;background:rgba(10,20,30,.55);z-index:100;align-items:center;justify-content:center;padding:14px">
+ <div class="card" style="max-width:620px;width:100%;max-height:90vh;overflow:auto">
+  <h2>Feedback da aula</h2>
+  <div class="row" id="ratingRow"><button class="btn" data-rate="1">1</button><button class="btn" data-rate="2">2</button><button class="btn" data-rate="3">3</button><button class="btn" data-rate="4">4</button><button class="btn" data-rate="5">5</button></div>
+  <div class="grid" style="margin-top:8px">
+   <div class="field"><label>Fluidez</label><select id="fbFlow"><option>Fraca</option><option selected>Boa</option><option>Excelente</option></select></div>
+   <div class="field"><label>Dificuldade</label><select id="fbDifficulty"><option>Fácil</option><option selected>Certa</option><option>Difícil</option></select></div>
+   <div class="field"><label>Variedade</label><select id="fbVariety"><option>Pouca</option><option selected>Certa</option><option>Demasiada</option></select></div>
+   <div class="field"><label>Tempo</label><select id="fbTiming"><option>Curto</option><option selected>Certo</option><option>Longo</option></select></div>
+  </div>
+  <div style="margin-top:8px"><label>Notas</label><textarea id="fbNotes" placeholder="O que funcionou / o que mudavas..."></textarea></div>
+  <div class="row" style="margin-top:9px"><button class="btn primary" id="saveFeedback">GUARDAR</button><button class="btn" id="closeFeedback">FECHAR</button></div>
+ </div>
+</div>
