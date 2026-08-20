@@ -1,4 +1,4 @@
-name: Deploy BLUE Symbiote to GitHub Pages
+name: Validate and deploy BLUE Symbiote
 
 on:
   push:
@@ -23,14 +23,48 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Validate production package
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in index.html manifest.json styles.css boot.js service-worker.js ui-1.txt ui-2.txt data-{1..7}.txt code-{1..7}.txt icon-180.png icon-192.png icon-512.png icon-512-maskable.png; do
+            test -s "$f" || { echo "Missing or empty: $f"; exit 1; }
+          done
+          cat code-{1..7}.txt > /tmp/blue-code.js
+          node --check /tmp/blue-code.js
+          python - <<'PY'
+          import json, pathlib, re
+          data=''.join(pathlib.Path(f'data-{i}.txt').read_text(encoding='utf-8') for i in range(1,8))
+          obj=json.loads(data)
+          assert len(obj['exerciseRows']) == 397, len(obj['exerciseRows'])
+          manifest=json.loads(pathlib.Path('manifest.json').read_text(encoding='utf-8'))
+          assert manifest['scope'] == './'
+          assert manifest['start_url'].startswith('./')
+          assert all(not x['src'].startswith('/') for x in manifest['icons'])
+          ui=''.join(pathlib.Path(f'ui-{i}.txt').read_text(encoding='utf-8') for i in (1,2))
+          required=['config','suggest','build','follow','edu','visual','history','classType','duration','difficulty','scratchBtn','findBtn','blocks','stepMode','eduList','visualList','historyList','installBtn']
+          for rid in required:
+              assert f'id="{rid}"' in ui, rid
+          boot=pathlib.Path('boot.js').read_text(encoding='utf-8')
+          for name in [*(f'ui-{i}.txt' for i in (1,2)),*(f'data-{i}.txt' for i in range(1,8)),*(f'code-{i}.txt' for i in range(1,8))]:
+              assert name in boot, name
+          sw=pathlib.Path('service-worker.js').read_text(encoding='utf-8')
+          for name in ['index.html','manifest.json','styles.css','boot.js','ui-1.txt','ui-2.txt','data-7.txt','code-7.txt','icon-192.png','icon-512.png']:
+              assert name in sw, name
+          print('BLUE package OK: 397 exercises, JS syntax OK, manifest and offline assets OK')
+          PY
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
         with:
           enablement: true
+
       - name: Upload site
         uses: actions/upload-pages-artifact@v3
         with:
           path: "."
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
