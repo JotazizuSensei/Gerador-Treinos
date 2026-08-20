@@ -1,0 +1,6 @@
+('updateBtn'))$('updateBtn').onclick=checkForUpdate;if($('applyUpdateBtn'))$('applyUpdateBtn').onclick=applyUpdate;
+const initialView=new URLSearchParams(location.search).get('view');if(initialView&&document.getElementById(initialView))nav(initialView);
+registerPWA();updateDeviceStatus();hydrateStateFromDB();
+setTimeout(()=>{if(!currentClass&&state.history.length){currentClass=JSON.parse(JSON.stringify(state.history[state.history.length-1]));finishClass()}},150);
+
+renderHistory();renderBuild();renderSuggestions();renderVisualLibrary();loadVisualCache().then(()=>{renderVisualLibrary();renderBuild();renderFollow()});
