@@ -24,7 +24,7 @@
   const EXPECTED='0090f2c7066f9aed2fc9567933851d82d95eaadef02f1cc5dead7aa83da17098';
   try{
     if(!('DecompressionStream' in window)) throw new Error('O browser precisa de ser atualizado para executar esta versão da aplicação.');
-    const files=['payload-1.txt','payload-2a.txt','payload-2b.txt','payload-2c.txt','payload-2d.txt','payload-3.txt','payload-4.txt'];
+    const files=['payload-1a.txt','payload-1b.txt','payload-1c.txt','payload-1d.txt','payload-2a.txt','payload-2b.txt','payload-2c.txt','payload-2d.txt','payload-3.txt','payload-4.txt'];
     let b64='';
     for(const f of files){
       const r=await fetch('./'+f+'?v='+VERSION,{cache:'no-store'});
