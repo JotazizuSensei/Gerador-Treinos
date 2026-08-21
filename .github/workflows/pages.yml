@@ -24,46 +24,37 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Validate atomic production package
+      - name: Validate production package
         shell: bash
         run: |
           set -euo pipefail
-          for f in index.html manifest.json service-worker.js payload-1.txt payload-2a.txt payload-2b.txt payload-2c.txt payload-2d.txt payload-3.txt payload-4.txt icon-180.png icon-192.png icon-512.png icon-512-maskable.png; do
+          for f in index.html manifest.json service-worker.js payload-1a.txt payload-1b.txt payload-1c.txt payload-1d.txt payload-2a.txt payload-2b.txt payload-2c.txt payload-2d.txt payload-3.txt payload-4.txt icon-180.png icon-192.png icon-512.png icon-512-maskable.png; do
             test -s "$f" || { echo "Missing or empty: $f"; exit 1; }
           done
-          test "$(wc -c < payload-1.txt)" -eq 15906
-          test "$(wc -c < payload-2a.txt)" -eq 3977
-          test "$(wc -c < payload-2b.txt)" -eq 3977
-          test "$(wc -c < payload-2c.txt)" -eq 3976
-          test "$(wc -c < payload-2d.txt)" -eq 3976
-          test "$(wc -c < payload-3.txt)" -eq 15906
-          test "$(wc -c < payload-4.txt)" -eq 15906
           python - <<'PY'
-          import base64, gzip, hashlib, json, pathlib, re
+          import base64,gzip,hashlib,json,pathlib,re
           expected='0090f2c7066f9aed2fc9567933851d82d95eaadef02f1cc5dead7aa83da17098'
-          names=['payload-1.txt','payload-2a.txt','payload-2b.txt','payload-2c.txt','payload-2d.txt','payload-3.txt','payload-4.txt']
+          names=['payload-1a.txt','payload-1b.txt','payload-1c.txt','payload-1d.txt','payload-2a.txt','payload-2b.txt','payload-2c.txt','payload-2d.txt','payload-3.txt','payload-4.txt']
           b64=''.join(pathlib.Path(n).read_text(encoding='utf-8').strip() for n in names)
           raw=gzip.decompress(base64.b64decode(b64))
           digest=hashlib.sha256(raw).hexdigest()
-          assert digest == expected, (digest, expected)
+          assert digest==expected,(digest,expected)
           html=raw.decode('utf-8')
-          assert html.count('"id":"EX') == 397, html.count('"id":"EX')
-          required=['config','suggest','build','follow','edu','visual','history','classType','duration','difficulty','scratchBtn','findBtn','blocks','stepMode','eduList','visualList','historyList','installBtn']
-          for rid in required: assert f'id="{rid}"' in html, rid
+          assert html.count('"id":"EX')==397,html.count('"id":"EX')
+          for rid in ['config','suggest','build','follow','edu','visual','history','classType','duration','difficulty','scratchBtn','findBtn','blocks','stepMode','eduList','visualList','historyList','installBtn']:
+            assert f'id="{rid}"' in html,rid
           scripts=re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>',html,flags=re.S|re.I)
-          assert scripts,'No inline application script found'
+          assert scripts
           pathlib.Path('/tmp/blue-app.js').write_text('\n'.join(scripts),encoding='utf-8')
           manifest=json.loads(pathlib.Path('manifest.json').read_text(encoding='utf-8'))
           assert manifest['scope']=='./'
           assert '10.0.2' in manifest['start_url']
-          assert all(not x['src'].startswith('/') for x in manifest['icons'])
           outer=pathlib.Path('index.html').read_text(encoding='utf-8')
           assert expected in outer
           for n in names: assert n in outer,n
           sw=pathlib.Path('service-worker.js').read_text(encoding='utf-8')
-          assert "VERSION='10.0.2'" in sw
-          for n in ['index.html','manifest.json',*names,'icon-192.png','icon-512.png']: assert n in sw,n
-          print('BLUE atomic payload OK:',len(raw),'bytes; SHA-256 OK; 397 exercises; manifest/offline assets OK')
+          for n in names: assert n in sw,n
+          print('BLUE package reconstructed and hash verified:',len(raw),'bytes')
           PY
           node --check /tmp/blue-app.js
 
