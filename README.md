@@ -1,62 +1,44 @@
-# BLUE SYMBIOTE v10
+# BLUE SYMBIOTE v10.0.2
 
 Versão de produção do sistema de aulas BLUE.
 
-## Fonte oficial
+## Regra principal
 
-Esta pasta/repositório é a versão atual a manter. Não misturar aqui versões antigas, ficheiros de teste, exports, backups ou imagens pessoais.
+Existe **uma única aplicação** para PC, portátil e telemóvel: a PWA publicada por HTTPS. O utilizador abre sempre o mesmo endereço e instala a mesma app no dispositivo.
 
-## Ficheiros de produção a manter
+## Produção atual
 
-- `index.html` — entrada da app
+Os únicos ficheiros necessários em runtime são:
+
+- `index.html` — carregador atómico da app
+- `payload-1.txt` … `payload-4.txt` — uma única versão compactada da aplicação completa
 - `manifest.json` — instalação PWA
-- `service-worker.js` — funcionamento offline e atualizações
-- `styles.css` — interface
-- `boot.js` — carregador da aplicação
-- `ui-1.txt`, `ui-2.txt` — interface principal
-- `data-1.txt` … `data-7.txt` — biblioteca compacta de exercícios e referências
-- `code-1.txt` … `code-7.txt` — lógica da app
+- `service-worker.js` — offline e atualização
 - `icon-180.png`, `icon-192.png`, `icon-512.png`, `icon-512-maskable.png` — ícones
-- `.github/workflows/pages.yml` — validação e publicação automática por HTTPS
+- `.github/workflows/pages.yml` — validação e publicação automática
 
-## O que NÃO deve ficar misturado na pasta principal
+## Porque mudou
 
-Mover para uma pasta local separada, fora do repositório:
+A versão anterior executava JavaScript dividido por vários ficheiros. Um browser/cache podia receber partes de versões diferentes e provocar erros de sintaxe. A v10.0.2 deixou de executar fragmentos separados: os quatro `payload-*` são apenas dados de um único HTML validado. Antes de a app abrir, o carregador confirma o SHA-256 do pacote completo.
 
-- versões `v1` a `v9`
-- HTMLs de teste ou protótipos antigos
-- ficheiros temporários
-- backups JSON exportados pela app
-- imagens pessoais adicionadas à biblioteca
-- PDFs/vídeos de estudo
-- screenshots
-- ZIPs de trabalho
+SHA-256 esperado da aplicação: `0090f2c7066f9aed2fc9567933851d82d95eaadef02f1cc5dead7aa83da17098`.
 
-Estrutura local recomendada no Ambiente de Trabalho:
+## Validação antes de publicar
 
-```text
-BLUE_SYMBIOTE/
-├─ Gerador-Treinos/        <- cópia GitHub / produção atual
-├─ BACKUPS_APP/            <- backups JSON/HTML exportados pela app
-├─ IMAGENS_EXERCICIOS/     <- imagens verificadas a adicionar à app
-├─ FONTES_ESTUDO/          <- PDFs, vídeos, screenshots e referências
-└─ ARQUIVO_ANTIGO/         <- versões antigas e protótipos
-```
+O workflow bloqueia o deploy se falhar qualquer um destes pontos:
 
-## Regra de atualização
+- falta algum ficheiro de produção;
+- os quatro payloads não reconstruírem exatamente o mesmo pacote;
+- o SHA-256 não coincidir;
+- o JavaScript da aplicação não passar `node --check`;
+- não existirem as 397 ocorrências de exercícios esperadas;
+- faltar alguma vista/controlo essencial;
+- manifest ou cache offline estiverem incoerentes.
 
-1. Trabalhar apenas sobre `Gerador-Treinos` como fonte atual.
-2. Cada atualização é validada antes de ser publicada.
-3. A app instalada recebe a nova versão através do service worker, sem depender de reinstalação manual.
-4. Dados pessoais, histórico, aprendizagem BLUE EDU e imagens continuam locais; fazer `BACKUP COMPLETO` regularmente.
+## Dados do utilizador
 
-## Estado atual
+Histórico, feedback, preferências, BLUE EDU e biblioteca visual continuam guardados localmente no browser/PWA. Não é necessário apagar os dados para atualizar a aplicação.
 
-- versão de produção: **v10**
-- biblioteca: **397 ocorrências de exercícios**
-- instalação PWA configurada
-- modo offline configurado
-- BLUE EDU integrado
-- biblioteca visual integrada
-- histórico e aprendizagem local integrados
-- deploy automático por GitHub Pages configurado
+## Versões antigas
+
+Ficheiros antigos de desenvolvimento que ainda existam no repositório não fazem parte do runtime v10.0.2 e devem ser removidos após confirmação da versão publicada.
