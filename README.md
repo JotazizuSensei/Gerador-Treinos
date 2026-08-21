@@ -8,29 +8,34 @@ Existe **uma única aplicação** para PC, portátil e telemóvel: a PWA publica
 
 ## Produção atual
 
-Os únicos ficheiros necessários em runtime são:
+Ficheiros necessários em runtime:
 
 - `index.html` — carregador atómico da app
-- `payload-1.txt` … `payload-4.txt` — uma única versão compactada da aplicação completa
+- `payload-1.txt`
+- `payload-2a.txt`, `payload-2b.txt`, `payload-2c.txt`, `payload-2d.txt`
+- `payload-3.txt`, `payload-4.txt`
 - `manifest.json` — instalação PWA
 - `service-worker.js` — offline e atualização
 - `icon-180.png`, `icon-192.png`, `icon-512.png`, `icon-512-maskable.png` — ícones
 - `.github/workflows/pages.yml` — validação e publicação automática
 
+Os segmentos `payload-*` não são JavaScript executado separadamente. Juntos representam uma única cópia compactada do HTML completo e validado.
+
 ## Porque mudou
 
-A versão anterior executava JavaScript dividido por vários ficheiros. Um browser/cache podia receber partes de versões diferentes e provocar erros de sintaxe. A v10.0.2 deixou de executar fragmentos separados: os quatro `payload-*` são apenas dados de um único HTML validado. Antes de a app abrir, o carregador confirma o SHA-256 do pacote completo.
+A versão anterior executava JavaScript dividido por vários ficheiros. Um browser/cache podia receber partes de versões diferentes e provocar erros de sintaxe. A v10.0.2 deixou de executar fragmentos separados. Antes de abrir a aplicação, o carregador reconstrói o pacote completo e confirma o seu SHA-256.
 
-SHA-256 esperado da aplicação: `0090f2c7066f9aed2fc9567933851d82d95eaadef02f1cc5dead7aa83da17098`.
+SHA-256 esperado: `0090f2c7066f9aed2fc9567933851d82d95eaadef02f1cc5dead7aa83da17098`.
 
 ## Validação antes de publicar
 
-O workflow bloqueia o deploy se falhar qualquer um destes pontos:
+O workflow bloqueia o deploy se:
 
-- falta algum ficheiro de produção;
-- os quatro payloads não reconstruírem exatamente o mesmo pacote;
+- faltar algum ficheiro de produção;
+- o tamanho de algum segmento não for exatamente o esperado;
+- os segmentos não reconstruírem exatamente a mesma aplicação;
 - o SHA-256 não coincidir;
-- o JavaScript da aplicação não passar `node --check`;
+- o JavaScript não passar `node --check`;
 - não existirem as 397 ocorrências de exercícios esperadas;
 - faltar alguma vista/controlo essencial;
 - manifest ou cache offline estiverem incoerentes.
@@ -41,4 +46,4 @@ Histórico, feedback, preferências, BLUE EDU e biblioteca visual continuam guar
 
 ## Versões antigas
 
-Ficheiros antigos de desenvolvimento que ainda existam no repositório não fazem parte do runtime v10.0.2 e devem ser removidos após confirmação da versão publicada.
+Ficheiros antigos de desenvolvimento que ainda existam no repositório não fazem parte do runtime v10.0.2 e só devem ser removidos depois da confirmação da versão publicada.
