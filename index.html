@@ -24,17 +24,17 @@
   const EXPECTED='0090f2c7066f9aed2fc9567933851d82d95eaadef02f1cc5dead7aa83da17098';
   try{
     if(!('DecompressionStream' in window)) throw new Error('O browser precisa de ser atualizado para executar esta versão da aplicação.');
-    const files=['payload-1.txt','payload-2.txt','payload-3.txt','payload-4.txt'];
+    const files=['payload-1.txt','payload-2a.txt','payload-2b.txt','payload-2c.txt','payload-2d.txt','payload-3.txt','payload-4.txt'];
     let b64='';
     for(const f of files){
       const r=await fetch('./'+f+'?v='+VERSION,{cache:'no-store'});
       if(!r.ok) throw new Error('Falha a carregar '+f+' ('+r.status+')');
-      b64+=(await r.text()).trim();
+      b64+=(await r.text()).replace(/\s+/g,'');
     }
     const packed=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
     const html=await new Response(new Blob([packed]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
-    if(crypto?.subtle){
-      const digest=new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(html)));
+    if(window.crypto?.subtle){
+      const digest=new Uint8Array(await window.crypto.subtle.digest('SHA-256',new TextEncoder().encode(html)));
       const hex=Array.from(digest,b=>b.toString(16).padStart(2,'0')).join('');
       if(hex!==EXPECTED) throw new Error('Pacote da aplicação incompleto ou de versões diferentes.');
     }
