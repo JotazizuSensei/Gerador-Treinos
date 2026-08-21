@@ -24,36 +24,42 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Validate production package
+      - name: Validate atomic production package
         shell: bash
         run: |
           set -euo pipefail
-          for f in index.html manifest.json styles.css boot.js service-worker.js ui-1.txt ui-2.txt data-{1..7}.txt code-{1..7}.txt icon-180.png icon-192.png icon-512.png icon-512-maskable.png; do
+          for f in index.html manifest.json service-worker.js payload-{1..4}.txt icon-180.png icon-192.png icon-512.png icon-512-maskable.png; do
             test -s "$f" || { echo "Missing or empty: $f"; exit 1; }
           done
-          cat code-{1..7}.txt > /tmp/blue-code.js
-          node --check /tmp/blue-code.js
           python - <<'PY'
-          import json, pathlib, re
-          data=''.join(pathlib.Path(f'data-{i}.txt').read_text(encoding='utf-8') for i in range(1,8))
-          obj=json.loads(data)
-          assert len(obj['exerciseRows']) == 397, len(obj['exerciseRows'])
-          manifest=json.loads(pathlib.Path('manifest.json').read_text(encoding='utf-8'))
-          assert manifest['scope'] == './'
-          assert manifest['start_url'].startswith('./')
-          assert all(not x['src'].startswith('/') for x in manifest['icons'])
-          ui=''.join(pathlib.Path(f'ui-{i}.txt').read_text(encoding='utf-8') for i in (1,2))
+          import base64, gzip, hashlib, json, pathlib, re, sys
+          expected='0090f2c7066f9aed2fc9567933851d82d95eaadef02f1cc5dead7aa83da17098'
+          b64=''.join(pathlib.Path(f'payload-{i}.txt').read_text(encoding='utf-8').strip() for i in range(1,5))
+          raw=gzip.decompress(base64.b64decode(b64))
+          digest=hashlib.sha256(raw).hexdigest()
+          assert digest == expected, (digest, expected)
+          html=raw.decode('utf-8')
+          assert html.count('"id":"EX') == 397, html.count('"id":"EX')
           required=['config','suggest','build','follow','edu','visual','history','classType','duration','difficulty','scratchBtn','findBtn','blocks','stepMode','eduList','visualList','historyList','installBtn']
           for rid in required:
-              assert f'id="{rid}"' in ui, rid
-          boot=pathlib.Path('boot.js').read_text(encoding='utf-8')
-          for name in [*(f'ui-{i}.txt' for i in (1,2)),*(f'data-{i}.txt' for i in range(1,8)),*(f'code-{i}.txt' for i in range(1,8))]:
-              assert name in boot, name
+              assert f'id="{rid}"' in html, rid
+          scripts=re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>', html, flags=re.S|re.I)
+          assert scripts, 'No inline application script found'
+          pathlib.Path('/tmp/blue-app.js').write_text('\n'.join(scripts),encoding='utf-8')
+          manifest=json.loads(pathlib.Path('manifest.json').read_text(encoding='utf-8'))
+          assert manifest['scope']=='./'
+          assert '10.0.2' in manifest['start_url']
+          assert all(not x['src'].startswith('/') for x in manifest['icons'])
+          outer=pathlib.Path('index.html').read_text(encoding='utf-8')
+          assert expected in outer
+          for name in [f'payload-{i}.txt' for i in range(1,5)]: assert name in outer, name
           sw=pathlib.Path('service-worker.js').read_text(encoding='utf-8')
-          for name in ['index.html','manifest.json','styles.css','boot.js','ui-1.txt','ui-2.txt','data-7.txt','code-7.txt','icon-192.png','icon-512.png']:
+          assert "VERSION='10.0.2'" in sw
+          for name in ['index.html','manifest.json','payload-1.txt','payload-2.txt','payload-3.txt','payload-4.txt','icon-192.png','icon-512.png']:
               assert name in sw, name
-          print('BLUE package OK: 397 exercises, JS syntax OK, manifest and offline assets OK')
+          print('Atomic payload OK:',len(raw),'bytes; SHA-256 OK; 397 exercises; manifest/offline assets OK')
           PY
+          node --check /tmp/blue-app.js
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
