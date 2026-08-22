@@ -10,19 +10,39 @@
 <meta name="apple-mobile-web-app-title" content="BLUE Symbiote">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="robots" content="noindex,nofollow,noarchive">
-<link rel="manifest" href="./manifest.json?v=10.0.3">
+<link rel="manifest" href="./manifest.json?v=10.0.4">
 <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
 <link rel="apple-touch-icon" href="./icon-180.png">
-<title>BLUE Symbiote v10.0.3</title>
+<title>BLUE Symbiote v10.0.4</title>
 <style>body{margin:0;background:#edf3f7;color:#17212b;font-family:Arial,sans-serif}.boot{max-width:620px;margin:60px auto;padding:24px}.boot b{font-size:24px}.boot p{line-height:1.5}.err{white-space:pre-wrap;color:#8b1e1e}</style>
 </head>
-<body data-app-version="10.0.3">
-<main class="boot"><b>BLUE Symbiote</b><p>A iniciar a aplicação…</p></main>
+<body data-app-version="10.0.4">
+<main class="boot"><b>BLUE Symbiote</b><p>A verificar atualização e iniciar a aplicação…</p></main>
 <script>
 (async()=>{
-  const VERSION='10.0.3';
+  const VERSION='10.0.4';
   const EXPECTED='0090f2c7066f9aed2fc9567933851d82d95eaadef02f1cc5dead7aa83da17098';
+  async function autoUpdate(){
+    if(!('serviceWorker' in navigator)||location.protocol==='file:')return;
+    try{
+      let hadController=!!navigator.serviceWorker.controller;
+      let reloading=false;
+      navigator.serviceWorker.addEventListener('controllerchange',()=>{
+        if(!hadController){hadController=true;return;}
+        if(reloading)return;reloading=true;location.reload();
+      });
+      const reg=await navigator.serviceWorker.register('./service-worker.js',{scope:'./',updateViaCache:'none'});
+      const activate=worker=>{if(worker&&worker.state==='installed'&&navigator.serviceWorker.controller)worker.postMessage({type:'SKIP_WAITING'});};
+      if(reg.waiting&&navigator.serviceWorker.controller)reg.waiting.postMessage({type:'SKIP_WAITING'});
+      reg.addEventListener('updatefound',()=>{const w=reg.installing;if(w)w.addEventListener('statechange',()=>activate(w));});
+      await reg.update().catch(()=>{});
+      let lastCheck=Date.now();
+      document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&Date.now()-lastCheck>300000){lastCheck=Date.now();reg.update().catch(()=>{});}});
+      setInterval(()=>reg.update().catch(()=>{}),900000);
+    }catch(e){console.warn('Atualização automática indisponível nesta abertura.',e);}
+  }
   try{
+    await autoUpdate();
     if(!('DecompressionStream' in window)) throw new Error('O browser precisa de ser atualizado para executar esta versão da aplicação.');
     const files=['payload-1a.txt','payload-1b.txt','payload-1c.txt','payload-1d.txt','payload-2a.txt','payload-2b.txt','payload-2c.txt','payload-2d.txt','payload-3.txt','payload-4.txt'];
     let b64='';
@@ -38,7 +58,8 @@
       const hex=Array.from(digest,b=>b.toString(16).padStart(2,'0')).join('');
       if(hex!==EXPECTED) throw new Error('Pacote da aplicação incompleto ou de versões diferentes.');
     }
-    const patched=html.replace(/<\/body>/i,'<script src="./patch-10.0.3.js?v=10.0.3"><\/script><\/body>');
+    const patches='<script src="./patch-10.0.3.js?v='+VERSION+'"><\/script><script src="./patch-10.0.4.js?v='+VERSION+'"><\/script>';
+    const patched=html.replace(/<\/body>/i,patches+'</body>');
     document.open();document.write(patched);document.close();
   }catch(e){
     console.error('Falha ao iniciar BLUE Symbiote',e);
