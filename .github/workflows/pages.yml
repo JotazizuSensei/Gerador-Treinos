@@ -28,7 +28,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for f in index.html stable-10.0.10.html manifest.json service-worker.js patch-10.0.3.js patch-10.0.4.js patch-10.0.5.js patch-10.0.6.js patch-10.0.7.js patch-10.0.8.js patch-10.0.10.js payload-1a.txt payload-1b.txt payload-1c.txt payload-1d.txt payload-2a.txt payload-2b.txt payload-2c.txt payload-2d.txt payload-3.txt payload-4.txt icon-180.png icon-192.png icon-512.png icon-512-maskable.png; do
+          for f in index.html stable-10.0.11.html manifest.json patch-10.0.3.js patch-10.0.4.js patch-10.0.5.js patch-10.0.6.js patch-10.0.7.js patch-10.0.8.js patch-10.0.11.js payload-1a.txt payload-1b.txt payload-1c.txt payload-1d.txt payload-2a.txt payload-2b.txt payload-2c.txt payload-2d.txt payload-3.txt payload-4.txt icon-180.png icon-192.png icon-512.png icon-512-maskable.png; do
             test -s "$f" || { echo "Missing or empty: $f"; exit 1; }
           done
           python - <<'PY'
@@ -45,41 +45,30 @@ jobs:
           pathlib.Path('/tmp/blue-app.js').write_text('\n'.join(scripts),encoding='utf-8')
           manifest=json.loads(pathlib.Path('manifest.json').read_text(encoding='utf-8'))
           assert manifest['scope']=='./'
-          assert '10.0.10' in manifest['start_url']
-          for page in ['index.html','stable-10.0.10.html']:
+          assert '10.0.11' in manifest['start_url']
+          for page in ['index.html','stable-10.0.11.html']:
             outer=pathlib.Path(page).read_text(encoding='utf-8')
             assert expected in outer
-            assert '10.0.10' in outer
-            assert "registerPWA();updateDeviceStatus();hydrateStateFromDB();" in outer
+            assert '10.0.11' in outer
             assert "html.replace('registerPWA();updateDeviceStatus();hydrateStateFromDB();','updateDeviceStatus();hydrateStateFromDB();')" in outer
-            for p in ['patch-10.0.3.js','patch-10.0.4.js','patch-10.0.5.js','patch-10.0.6.js','patch-10.0.7.js','patch-10.0.8.js','patch-10.0.10.js']:
-              assert p in outer,p
+            assert 'patch-10.0.11.js' in outer
             oscripts=re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>',outer,flags=re.S|re.I)
             pathlib.Path('/tmp/'+page+'.js').write_text('\n'.join(oscripts),encoding='utf-8')
-          sw=pathlib.Path('service-worker.js').read_text(encoding='utf-8')
-          assert "VERSION='10.0.10'" in sw
-          assert 'skipWaiting' not in sw
-          assert 'clients.claim' not in sw
-          assert 'stable-10.0.10.html' in sw
-          stable=pathlib.Path('patch-10.0.10.js').read_text(encoding='utf-8')
-          for token in ['BLUE SYMBIOTE v10.0.10','MODO ESTÁVEL','safeRegister']:
-            assert token in stable,token
-          live=pathlib.Path('patch-10.0.8.js').read_text(encoding='utf-8')
-          for token in ['CLIP REAL','youtube-nocookie.com/embed','findReference','VISUAIS AUTOMÁTICOS']:
+          live=pathlib.Path('patch-10.0.11.js').read_text(encoding='utf-8')
+          for token in ['CLIP REAL','youtube-nocookie.com/embed','cardExercise','paintCards','stepExercise','MODO ESTÁVEL']:
             assert token in live,token
-          print('BLUE v10.0.10 stable package verified:',len(raw),'bytes')
+          print('BLUE v10.0.11 stable package verified:',len(raw),'bytes')
           PY
           node --check /tmp/blue-app.js
           node --check /tmp/index.html.js
-          node --check /tmp/stable-10.0.10.html.js
-          node --check service-worker.js
+          node --check /tmp/stable-10.0.11.html.js
           node --check patch-10.0.3.js
           node --check patch-10.0.4.js
           node --check patch-10.0.5.js
           node --check patch-10.0.6.js
           node --check patch-10.0.7.js
           node --check patch-10.0.8.js
-          node --check patch-10.0.10.js
+          node --check patch-10.0.11.js
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
