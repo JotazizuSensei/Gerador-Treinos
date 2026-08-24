@@ -28,7 +28,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for f in index.html manifest.json service-worker.js patch-10.0.3.js patch-10.0.4.js payload-1a.txt payload-1b.txt payload-1c.txt payload-1d.txt payload-2a.txt payload-2b.txt payload-2c.txt payload-2d.txt payload-3.txt payload-4.txt icon-180.png icon-192.png icon-512.png icon-512-maskable.png; do
+          for f in index.html manifest.json service-worker.js patch-10.0.3.js patch-10.0.4.js patch-10.0.5.js payload-1a.txt payload-1b.txt payload-1c.txt payload-1d.txt payload-2a.txt payload-2b.txt payload-2c.txt payload-2d.txt payload-3.txt payload-4.txt icon-180.png icon-192.png icon-512.png icon-512-maskable.png; do
             test -s "$f" || { echo "Missing or empty: $f"; exit 1; }
           done
           python - <<'PY'
@@ -48,24 +48,30 @@ jobs:
           pathlib.Path('/tmp/blue-app.js').write_text('\n'.join(scripts),encoding='utf-8')
           manifest=json.loads(pathlib.Path('manifest.json').read_text(encoding='utf-8'))
           assert manifest['scope']=='./'
-          assert '10.0.4' in manifest['start_url']
+          assert '10.0.5' in manifest['start_url']
           outer=pathlib.Path('index.html').read_text(encoding='utf-8')
           assert expected in outer
-          assert '10.0.4' in outer
-          assert 'patch-10.0.3.js' in outer and 'patch-10.0.4.js' in outer
+          assert '10.0.5' in outer
+          for p in ['patch-10.0.3.js','patch-10.0.4.js','patch-10.0.5.js']:
+            assert p in outer,p
           outer_scripts=re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>',outer,flags=re.S|re.I)
           pathlib.Path('/tmp/blue-loader.js').write_text('\n'.join(outer_scripts),encoding='utf-8')
           sw=pathlib.Path('service-worker.js').read_text(encoding='utf-8')
-          assert "VERSION='10.0.4'" in sw
-          assert 'patch-10.0.3.js' in sw and 'patch-10.0.4.js' in sw
+          assert "VERSION='10.0.5'" in sw
+          for p in ['patch-10.0.3.js','patch-10.0.4.js','patch-10.0.5.js']:
+            assert p in sw,p
           for n in names: assert n in sw,n
-          print('BLUE package reconstructed and hash verified:',len(raw),'bytes')
+          patch=pathlib.Path('patch-10.0.5.js').read_text(encoding='utf-8')
+          for token in ['AUTO-FRAMES','AUTO-EXTRAIR FRAMES','blue_symbiote_visual_v7','sourcePool','FRAME VÍDEO']:
+            assert token in patch,token
+          print('BLUE v10.0.5 package reconstructed and AUTO-FRAMES verified:',len(raw),'bytes')
           PY
           node --check /tmp/blue-app.js
           node --check /tmp/blue-loader.js
           node --check service-worker.js
           node --check patch-10.0.3.js
           node --check patch-10.0.4.js
+          node --check patch-10.0.5.js
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
