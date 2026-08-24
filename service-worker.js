@@ -1,6 +1,6 @@
-const VERSION='10.0.4';
+const VERSION='10.0.5';
 const CACHE='blue-symbiote-auto-'+VERSION;
-const CORE=['./','./index.html','./manifest.json','./patch-10.0.3.js','./patch-10.0.4.js','./payload-1a.txt','./payload-1b.txt','./payload-1c.txt','./payload-1d.txt','./payload-2a.txt','./payload-2b.txt','./payload-2c.txt','./payload-2d.txt','./payload-3.txt','./payload-4.txt','./icon-180.png','./icon-192.png','./icon-512.png','./icon-512-maskable.png'];
+const CORE=['./','./index.html','./manifest.json','./patch-10.0.3.js','./patch-10.0.4.js','./patch-10.0.5.js','./payload-1a.txt','./payload-1b.txt','./payload-1c.txt','./payload-1d.txt','./payload-2a.txt','./payload-2b.txt','./payload-2c.txt','./payload-2d.txt','./payload-3.txt','./payload-4.txt','./icon-180.png','./icon-192.png','./icon-512.png','./icon-512-maskable.png'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()));
 });
