@@ -2,8 +2,8 @@
   "id": "./",
   "name": "BLUE Symbiote — Coach OS",
   "short_name": "BLUE Symbiote",
-  "description": "Sistema operativo de aulas para treinador: criação, sugestões, TRAINING LAB, componente social/cooperativa flexível, visuais reais automáticos com fallback público, AUTO-FRAMES, modo aula, biblioteca visual, BLUE EDU e aprendizagem.",
-  "start_url": "./?v=10.0.12&view=config",
+  "description": "Sistema operativo de aulas para treinador: criação, sugestões, TRAINING LAB, componente social/cooperativa flexível, biblioteca visual aprendente e editável, visuais reais automáticos, AUTO-FRAMES, modo aula, BLUE EDU e aprendizagem.",
+  "start_url": "./?v=10.1.0&view=config",
   "scope": "./",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],
@@ -18,9 +18,9 @@
     {"src":"./icon-512-maskable.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
   ],
   "shortcuts": [
-    {"name":"Criar aula","short_name":"Criar","url":"./?v=10.0.12&view=config","icons":[{"src":"./icon-192.png","sizes":"192x192","type":"image/png"}]},
-    {"name":"Seguir aula","short_name":"Seguir","url":"./?v=10.0.12&view=follow","icons":[{"src":"./icon-192.png","sizes":"192x192","type":"image/png"}]},
-    {"name":"Biblioteca visual","short_name":"Imagens","url":"./?v=10.0.12&view=visual","icons":[{"src":"./icon-192.png","sizes":"192x192","type":"image/png"}]},
-    {"name":"BLUE EDU","short_name":"Edu","url":"./?v=10.0.12&view=edu","icons":[{"src":"./icon-192.png","sizes":"192x192","type":"image/png"}]}
+    {"name":"Criar aula","short_name":"Criar","url":"./?v=10.1.0&view=config","icons":[{"src":"./icon-192.png","sizes":"192x192","type":"image/png"}]},
+    {"name":"Seguir aula","short_name":"Seguir","url":"./?v=10.1.0&view=follow","icons":[{"src":"./icon-192.png","sizes":"192x192","type":"image/png"}]},
+    {"name":"Biblioteca visual","short_name":"Imagens","url":"./?v=10.1.0&view=visual","icons":[{"src":"./icon-192.png","sizes":"192x192","type":"image/png"}]},
+    {"name":"BLUE EDU","short_name":"Edu","url":"./?v=10.1.0&view=edu","icons":[{"src":"./icon-192.png","sizes":"192x192","type":"image/png"}]}
   ]
 }
