@@ -10,17 +10,17 @@
 <meta name="apple-mobile-web-app-title" content="BLUE Symbiote">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="robots" content="noindex,nofollow,noarchive">
-<link rel="manifest" href="./manifest.json?v=10.0.12">
+<link rel="manifest" href="./manifest.json?v=10.1.0">
 <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
 <link rel="apple-touch-icon" href="./icon-180.png">
-<title>BLUE Symbiote v10.0.12</title>
+<title>BLUE Symbiote v10.1.0 FINAL</title>
 <style>body{margin:0;background:#edf3f7;color:#17212b;font-family:Arial,sans-serif}.boot{max-width:620px;margin:60px auto;padding:24px}.boot b{font-size:24px}.boot p{line-height:1.5}.err{white-space:pre-wrap;color:#8b1e1e}</style>
 </head>
-<body data-app-version="10.0.12">
-<main class="boot"><b>BLUE Symbiote v10.0.12</b><p>A iniciar em modo estável…</p></main>
+<body data-app-version="10.1.0">
+<main class="boot"><b>BLUE Symbiote v10.1.0 FINAL</b><p>A iniciar em modo estável…</p></main>
 <script>
 (async()=>{
-  const VERSION='10.0.12';
+  const VERSION='10.1.0';
   const EXPECTED='0090f2c7066f9aed2fc9567933851d82d95eaadef02f1cc5dead7aa83da17098';
   try{
     if('serviceWorker' in navigator&&location.protocol!=='file:'){
@@ -35,12 +35,12 @@
     if(window.crypto?.subtle){const digest=new Uint8Array(await window.crypto.subtle.digest('SHA-256',new TextEncoder().encode(html)));const hex=Array.from(digest,b=>b.toString(16).padStart(2,'0')).join('');if(hex!==EXPECTED)throw new Error('Pacote da aplicação incompleto ou de versões diferentes.')}
     html=html.replace('registerPWA();updateDeviceStatus();hydrateStateFromDB();','updateDeviceStatus();hydrateStateFromDB();');
     html=html.replace("if($('updateBtn'))$('updateBtn').onclick=checkForUpdate;if($('applyUpdateBtn'))$('applyUpdateBtn').onclick=applyUpdate;","if($('updateBtn'))$('updateBtn').onclick=()=>alert('Modo estável ativo.');if($('applyUpdateBtn'))$('applyUpdateBtn').onclick=()=>{};");
-    html=html.replace(/BLUE SYMBIOTE v10(?!\.\d)/,'BLUE SYMBIOTE v10.0.12');
-    html=html.replace('instalável · offline · portátil · aulas + imagens + BLUE EDU + aprendizagem','MODO ESTÁVEL · VISUAIS REAIS + BASE PÚBLICA · TRAINING LAB · SOCIAL FLEXÍVEL · BLUE EDU');
-    const patches='<script src="./patch-10.0.3.js?v='+VERSION+'"><\/script><script src="./patch-10.0.4.js?v='+VERSION+'"><\/script><script src="./patch-10.0.5.js?v='+VERSION+'"><\/script><script src="./patch-10.0.6.js?v='+VERSION+'"><\/script><script src="./patch-10.0.7.js?v='+VERSION+'"><\/script><script src="./patch-10.0.8.js?v='+VERSION+'"><\/script><script src="./patch-10.0.11.js?v='+VERSION+'"><\/script><script src="./patch-10.0.12.js?v='+VERSION+'"><\/script>';
+    html=html.replace(/BLUE SYMBIOTE v10(?!\.\d)/,'BLUE SYMBIOTE v10.1.0 FINAL');
+    html=html.replace('instalável · offline · portátil · aulas + imagens + BLUE EDU + aprendizagem','MODO ESTÁVEL · BIBLIOTECA VISUAL APRENDENTE · TRAINING LAB · SOCIAL FLEXÍVEL · BLUE EDU');
+    const patches='<script src="./patch-10.0.3.js?v='+VERSION+'"><\/script><script src="./patch-10.0.4.js?v='+VERSION+'"><\/script><script src="./patch-10.0.5.js?v='+VERSION+'"><\/script><script src="./patch-10.0.6.js?v='+VERSION+'"><\/script><script src="./patch-10.0.7.js?v='+VERSION+'"><\/script><script src="./patch-10.0.8.js?v='+VERSION+'"><\/script><script src="./patch-10.0.11.js?v='+VERSION+'"><\/script><script src="./patch-10.0.12.js?v='+VERSION+'"><\/script><script src="./patch-10.1.0.js?v='+VERSION+'"><\/script>';
     const patched=html.replace(/<\/body>/i,patches+'</body>');
     document.open();document.write(patched);document.close();
-  }catch(e){console.error(e);document.body.innerHTML='<main class="boot"><b>BLUE Symbiote v10.0.12</b><p>Falha ao iniciar a aplicação.</p><pre class="err">'+String(e)+'</pre></main>'}
+  }catch(e){console.error(e);document.body.innerHTML='<main class="boot"><b>BLUE Symbiote v10.1.0 FINAL</b><p>Falha ao iniciar a aplicação.</p><pre class="err">'+String(e)+'</pre></main>'}
 })();
 </script>
 </body>
