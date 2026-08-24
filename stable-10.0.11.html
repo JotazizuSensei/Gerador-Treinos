@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b5f9e">
+<meta name="application-name" content="BLUE Symbiote">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="BLUE Symbiote">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>BLUE Symbiote v10.0.11 — estável</title>
+<style>body{margin:0;background:#edf3f7;color:#17212b;font-family:Arial,sans-serif}.boot{max-width:620px;margin:60px auto;padding:24px}.boot b{font-size:24px}.boot p{line-height:1.5}.err{white-space:pre-wrap;color:#8b1e1e}</style>
+</head>
+<body data-app-version="10.0.11">
+<main class="boot"><b>BLUE Symbiote v10.0.11</b><p>A iniciar em modo estável, sem atualização automática…</p></main>
+<script>
+(async()=>{
+  const VERSION='10.0.11';
+  const EXPECTED='0090f2c7066f9aed2fc9567933851d82d95eaadef02f1cc5dead7aa83da17098';
+  try{
+    if('serviceWorker' in navigator&&location.protocol!=='file:'){
+      try{const regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(r=>r.unregister().catch(()=>false)))}catch(e){}
+    }
+    if(!('DecompressionStream' in window))throw new Error('O browser precisa de ser atualizado para executar esta versão da aplicação.');
+    const files=['payload-1a.txt','payload-1b.txt','payload-1c.txt','payload-1d.txt','payload-2a.txt','payload-2b.txt','payload-2c.txt','payload-2d.txt','payload-3.txt','payload-4.txt'];
+    let b64='';
+    for(const f of files){const r=await fetch('./'+f+'?v='+VERSION+'&t='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('Falha a carregar '+f+' ('+r.status+')');b64+=(await r.text()).replace(/\s+/g,'')}
+    const packed=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
+    let html=await new Response(new Blob([packed]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
+    if(window.crypto?.subtle){const digest=new Uint8Array(await window.crypto.subtle.digest('SHA-256',new TextEncoder().encode(html)));const hex=Array.from(digest,b=>b.toString(16).padStart(2,'0')).join('');if(hex!==EXPECTED)throw new Error('Pacote da aplicação incompleto ou de versões diferentes.')}
+    html=html.replace('registerPWA();updateDeviceStatus();hydrateStateFromDB();','updateDeviceStatus();hydrateStateFromDB();');
+    html=html.replace("if($('updateBtn'))$('updateBtn').onclick=checkForUpdate;if($('applyUpdateBtn'))$('applyUpdateBtn').onclick=applyUpdate;","if($('updateBtn'))$('updateBtn').onclick=()=>alert('Modo estável ativo.');if($('applyUpdateBtn'))$('applyUpdateBtn').onclick=()=>{};");
+    html=html.replace(/BLUE SYMBIOTE v10(?!\.\d)/,'BLUE SYMBIOTE v10.0.11');
+    html=html.replace('instalável · offline · portátil · aulas + imagens + BLUE EDU + aprendizagem','MODO ESTÁVEL · VISUAIS REAIS AUTOMÁTICOS · TRAINING LAB · SOCIAL FLEXÍVEL · BLUE EDU');
+    const patches='<script src="./patch-10.0.3.js?v='+VERSION+'"><\/script><script src="./patch-10.0.4.js?v='+VERSION+'"><\/script><script src="./patch-10.0.5.js?v='+VERSION+'"><\/script><script src="./patch-10.0.6.js?v='+VERSION+'"><\/script><script src="./patch-10.0.7.js?v='+VERSION+'"><\/script><script src="./patch-10.0.8.js?v='+VERSION+'"><\/script><script src="./patch-10.0.11.js?v='+VERSION+'"><\/script>';
+    const patched=html.replace(/<\/body>/i,patches+'</body>');
+    document.open();document.write(patched);document.close();
+  }catch(e){console.error(e);document.body.innerHTML='<main class="boot"><b>BLUE Symbiote v10.0.11</b><p>Falha ao iniciar a aplicação.</p><pre class="err">'+String(e)+'</pre></main>'}
+})();
+</script>
+</body>
+</html>
