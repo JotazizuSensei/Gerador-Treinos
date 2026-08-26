@@ -28,7 +28,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for f in index.html stable-10.1.0.html manifest.json patch-10.0.3.js patch-10.0.4.js patch-10.0.5.js patch-10.0.6.js patch-10.0.7.js patch-10.0.8.js patch-10.0.11.js patch-10.0.12.js patch-10.1.0.js payload-1a.txt payload-1b.txt payload-1c.txt payload-1d.txt payload-2a.txt payload-2b.txt payload-2c.txt payload-2d.txt payload-3.txt payload-4.txt icon-180.png icon-192.png icon-512.png icon-512-maskable.png; do
+          for f in index.html manifest.json service-worker.js patch-10.0.3.js patch-10.0.4.js patch-10.0.5.js patch-10.0.6.js patch-10.0.7.js patch-10.0.8.js patch-10.0.11.js patch-10.0.12.js patch-10.1.0.js patch-10.2.0-auth.js payload-1a.txt payload-1b.txt payload-1c.txt payload-1d.txt payload-2a.txt payload-2b.txt payload-2c.txt payload-2d.txt payload-3.txt payload-4.txt icon-180.png icon-192.png icon-512.png icon-512-maskable.png; do
             test -s "$f" || { echo "Missing or empty: $f"; exit 1; }
           done
           python - <<'PY'
@@ -45,24 +45,25 @@ jobs:
           pathlib.Path('/tmp/blue-app.js').write_text('\n'.join(scripts),encoding='utf-8')
           manifest=json.loads(pathlib.Path('manifest.json').read_text(encoding='utf-8'))
           assert manifest['scope']=='./'
-          assert '10.1.0' in manifest['start_url']
-          for page in ['index.html','stable-10.1.0.html']:
-            outer=pathlib.Path(page).read_text(encoding='utf-8')
-            assert expected in outer
-            assert '10.1.0' in outer
-            assert "html.replace('registerPWA();updateDeviceStatus();hydrateStateFromDB();','updateDeviceStatus();hydrateStateFromDB();')" in outer
-            for p in ['patch-10.0.11.js','patch-10.0.12.js','patch-10.1.0.js']:
-              assert p in outer,p
-            oscripts=re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>',outer,flags=re.S|re.I)
-            pathlib.Path('/tmp/'+page+'.js').write_text('\n'.join(oscripts),encoding='utf-8')
-          learned=pathlib.Path('patch-10.1.0.js').read_text(encoding='utf-8')
-          for token in ['BIBLIOTECA VISUAL APRENDENTE','GUARDAR E REUTILIZAR','Nomes equivalentes / aliases','indexedDB','EXPORTAR APRENDIZAGEM','IMPORTAR','MINHA REFERÊNCIA']:
-            assert token in learned,token
-          print('BLUE v10.1.0 FINAL package verified:',len(raw),'bytes')
+          assert '10.2.0' in manifest['start_url']
+          outer=pathlib.Path('index.html').read_text(encoding='utf-8')
+          assert expected in outer
+          assert '10.2.0' in outer
+          assert 'patch-10.2.0-auth.js' in outer
+          assert 'getRegistrations' not in outer
+          oscripts=re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>',outer,flags=re.S|re.I)
+          pathlib.Path('/tmp/index.js').write_text('\n'.join(oscripts),encoding='utf-8')
+          auth=pathlib.Path('patch-10.2.0-auth.js').read_text(encoding='utf-8')
+          for token in ['BLUE SYMBIOTE','RECUPERAR PALAVRA-PASSE','blue_symbiote_members','blue_symbiote_state','SINCRONIZADO','serviceWorker.register']:
+            assert token in auth,token
+          sw=pathlib.Path('service-worker.js').read_text(encoding='utf-8')
+          assert "VERSION='10.2.0'" in sw
+          assert 'patch-10.2.0-auth.js' in sw
+          print('BLUE v10.2.0 package verified:',len(raw),'bytes')
           PY
           node --check /tmp/blue-app.js
-          node --check /tmp/index.html.js
-          node --check /tmp/stable-10.1.0.html.js
+          node --check /tmp/index.js
+          node --check service-worker.js
           node --check patch-10.0.3.js
           node --check patch-10.0.4.js
           node --check patch-10.0.5.js
@@ -72,6 +73,7 @@ jobs:
           node --check patch-10.0.11.js
           node --check patch-10.0.12.js
           node --check patch-10.1.0.js
+          node --check patch-10.2.0-auth.js
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
