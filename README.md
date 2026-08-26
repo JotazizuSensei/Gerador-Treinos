@@ -1,65 +1,68 @@
-# BLUE SYMBIOTE v10.0.5
+# BLUE SYMBIOTE v10.2.0
 
 Versão de produção do sistema de aulas BLUE.
 
 ## Regra principal
 
-Existe **uma única aplicação** para PC, portátil e telemóvel: a PWA publicada por HTTPS. A mesma instalação recebe atualizações automáticas sem ser necessário reinstalar.
+Existe **uma única aplicação** para PC, portátil e telemóvel: a PWA publicada por HTTPS. Não existem apps separadas por modalidade nem instalações diferentes para cada dispositivo.
 
-## Atualização automática
+## LOGIN + CONTA BLUE
 
-A app verifica atualizações sempre que abre, quando volta ao primeiro plano e periodicamente enquanto permanece aberta. Uma nova versão do `service-worker.js` é instalada e ativada automaticamente. Histórico, feedback, preferências, BLUE EDU, filtros e biblioteca visual mantêm-se no mesmo armazenamento.
+A v10.2.0 adiciona uma zona de login real, ligada ao projeto Supabase já existente.
 
-## AUTO-FRAMES — frames reais dos exercícios
+- email + palavra-passe;
+- recuperação de palavra-passe;
+- sessão persistente;
+- acesso apenas a membros autorizados do BLUE Symbiote;
+- estado visível: `SINCRONIZADO`, `A SINCRONIZAR…`, `OFFLINE` ou `ERRO NUVEM`;
+- botão `SAIR` no cabeçalho depois do login.
 
-A v10.0.5 adiciona uma camada de imagem baseada em vídeo real:
+A aplicação usa uma **publishable key** no browser e Row Level Security (RLS) no Supabase. Os dados privados ficam associados ao utilizador autenticado.
 
-- botão `AUTO-FRAMES` na aula;
-- associação automática entre exercício e fonte extraída através de `sourcePool`;
-- seleção automática da fonte quando a aula vem de um vídeo já extraído;
-- carregamento local do vídeo fonte uma única vez para captura exata de frames;
-- extração automática de 1 frame para movimentos simples e 2 frames para movimentos/transições dinâmicas;
-- frames guardados na mesma biblioteca visual IndexedDB já usada pela app;
-- reutilização automática desses frames em aulas futuras sempre que o mesmo exercício canónico voltar a aparecer;
-- identificação `FRAME VÍDEO` nas imagens capturadas;
-- botão `FLASH` por exercício para abrir rapidamente o fluxo de captura;
-- miniaturas reais das fontes nas sugestões quando existe ligação à internet;
-- o modo aula/scroll passa a beneficiar da mesma biblioteca sem trabalho adicional.
+## SINCRONIZAÇÃO ENTRE DISPOSITIVOS
 
-### Limitação técnica intencional
+O estado operacional guardado em `localStorage` com namespace `blue_symbiote_` é sincronizado para `public.blue_symbiote_state` no Supabase.
 
-Um browser não pode copiar diretamente pixels de um vídeo YouTube embebido devido às regras de origem/CORS do próprio browser. Por isso a app não finge que consegue obter uma imagem exata diretamente do player remoto. Para captura real do exercício, usa o ficheiro de vídeo no dispositivo; depois de extraídos, os frames ficam guardados e deixam de ser necessários novos carregamentos para esse exercício.
+Isto inclui o estado principal da app, histórico, feedback, preferências, BLUE EDU editado, filtros e configurações guardadas que usem esse namespace. Na primeira utilização, se a conta ainda não tiver estado remoto, a app envia o estado local existente; num dispositivo novo, restaura o estado remoto da mesma conta.
 
-A ordem dos exercícios dos vídeos `EXTRAÍDO` já existe na biblioteca BLUE. A auto-extração distribui os pontos de captura pela sequência da fonte e usa dois pontos em movimentos/transições mais dinâmicos.
+A sincronização é feita após alterações, quando a app volta ao primeiro plano e periodicamente. Em caso de falta de internet, uma sessão previamente autorizada pode continuar a trabalhar localmente e sincronizar quando a ligação regressa.
+
+**Nota:** imagens guardadas exclusivamente em IndexedDB continuam locais nesta etapa. Não fingir que esses binários já estão sincronizados; a camada cloud de visuais deve ser implementada separadamente com armazenamento adequado.
+
+## PWA / ATUALIZAÇÃO
+
+O `service-worker.js` voltou a fazer parte da produção. O login autorizado regista o service worker da versão atual, com cache offline dos ficheiros críticos e atualização do runtime pelo mesmo URL.
+
+## FUNCIONALIDADES PRESERVADAS
+
+- filtros livres/editáveis;
+- TRAINING LAB;
+- componente social/cooperativa;
+- AUTO-FRAMES;
+- biblioteca visual aprendente;
+- referências visuais reais;
+- modo aula;
+- BLUE EDU;
+- histórico, feedback e aprendizagem.
 
 ## TRAINING LAB
 
-Preset de programação incorporado:
+Base permanente: **TRX, barras suspensas, barra + discos, kettlebells e peso corporal**. Halteres são recurso complementar.
 
-- base permanente: **TRX, barras suspensas, barra + discos, kettlebells e peso corporal**;
-- halteres = recurso complementar;
-- ordem de decisão: **objetivo da sessão → padrão de movimento → melhor exercício → material mínimo necessário**;
-- prioridade a transições rápidas, pouco material espalhado, montagem simples, mínimo tempo morto e várias pessoas em simultâneo;
-- material escrito explicitamente pelo treinador prevalece sobre o preset automático.
+Regra de decisão: **objetivo da sessão → padrão de movimento → melhor exercício → material mínimo necessário**.
 
-## Filtros
-
-Os filtros principais são editáveis. O treinador pode escolher sugestões ou escrever novas opções para modalidade, duração, perfil da turma, equipamento, impacto, foco e contexto. A configuração de aulas de grupo não obriga a selecionar patologias individuais.
-
-## Produção atual
+## PRODUÇÃO ATUAL
 
 Ficheiros runtime principais:
 
-- `index.html` — carregador atómico + auto-update
-- `payload-1a.txt`…`payload-4.txt` — aplicação-base compactada/validada
-- `patch-10.0.3.js` — filtros livres + equipamento
-- `patch-10.0.4.js` — TRAINING LAB
-- `patch-10.0.5.js` — AUTO-FRAMES
-- `manifest.json`
-- `service-worker.js`
-- ícones PWA
-- `.github/workflows/pages.yml` — validação e deploy
+- `index.html` — único entrypoint da app;
+- `payload-1a.txt`…`payload-4.txt` — aplicação-base compactada/validada;
+- `patch-10.0.3.js` … `patch-10.1.0.js` — evolução funcional existente;
+- `patch-10.2.0-auth.js` — login + autorização + sync de estado + registo PWA;
+- `manifest.json`;
+- `service-worker.js`;
+- `.github/workflows/pages.yml` — validação e deploy.
 
 SHA-256 da aplicação-base: `0090f2c7066f9aed2fc9567933851d82d95eaadef02f1cc5dead7aa83da17098`.
 
-O workflow bloqueia o deploy se o pacote-base não reconstruir, o hash não coincidir, faltar algum ficheiro crítico ou qualquer loader/service worker/patch falhar `node --check`.
+O workflow valida o pacote-base, número de exercícios, versão, presença do login/cloud patch e sintaxe JavaScript antes de publicar.
